@@ -46,7 +46,7 @@ _Version 2 of the integration has many new features and quality of life enhancem
   - [xm_incident](TwilioFunctions/xm_incident.js)
   - [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
 
-- [xMatters Initiate Event via Phone Call Communication Plan](xMattersPlan/InitiateEventviaPhoneCallv2.zip)
+- [xMatters Initiate Event via Phone Call Workflow](xMattersPlan/InitiateEventviaPhoneCallv2.zip)
 
 # How it works
 
@@ -85,7 +85,7 @@ _Version 2 of the integration has many new features and quality of life enhancem
    - All event types above will target the same xMatters Workflow (On-Call Resource Alert)
 
 <kbd>
-  <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/flow.png">
+  <img src="/media/media/flow.png">
 </kbd>
 
 ```
@@ -199,36 +199,36 @@ http:/bit.ly/2sjdsis2
 
 **Wait Messages**
 
-Joke:
+    *Joke*:
 
-```
-- What do you call corn that joins the army? Kernel.
-- What’s the longest word in the dictionary? Smiles. Because there’s a mile between the two S’s.
-- What do you call a dad that has fallen through the ice? A Popsicle.
+    ```
+    - What do you call corn that joins the army? Kernel.
+    - What’s the longest word in the dictionary? Smiles. Because there’s a mile between the two S’s.
+    - What do you call a dad that has fallen through the ice? A Popsicle.
 
-```
+    ```
 
-Phrases:
+    *Phrases*:
 
-```
-- Your transcription is not quite finished.
-- Thanks for your patients, it wont be long.
-- Good things come to those who wait.
-- I'm still working on it.
-```
+    ```
+    - Your transcription is not quite finished.
+    - Thanks for your patients, it wont be long.
+    - Good things come to those who wait.
+    - I'm still working on it.
+    ```
 
-Static:
+    *Static*:
 
-```
-- Thanks for waiting, im still working on it...
-```
+    ```
+    - Thanks for waiting, im still working on it...
+    ```
 
 **Event Sent to xMatters**
 
-```
-- Sit back and relax, xMatters is taking care of business. Goodbye.
-- Oops, something went wrong. The event has not been sent. You will need to send this event directly from xMatters.
-```
+    ```
+    - Sit back and relax, xMatters is taking care of business. Goodbye.
+    - Oops, something went wrong. The event has not been sent. You will need to send this event directly from xMatters.
+    ```
 
 12. Twilio Function **xm_bridgeforward** is initiated.
 
@@ -239,16 +239,15 @@ Static:
 13. xMatters Inbound HTTP Trigger (Initite by Phone)
 
 - This inbound HTTP trigger starts the xMatters Workflow
+- You can customize this Flow and integrate with other applications.
 - The inbound HTTP Trigger will create the following outputs:
 
-Recipients
-Audio URL
-Description
-Short Description
-Type
-Severity
-
-- You can customize this Flow and integrate with other applications.
+  - Recipients
+  - Audio URL
+  - Description
+  - Short Description
+  - Type
+  - Severity
 
 # Installation
 
@@ -310,7 +309,7 @@ When first setting up this integration, before using the xMatters installation f
 [xMatters Constants](https://help.xmatters.com/ondemand/xmodwelcome/integrationbuilder/constants.htm)
 
 <kbd>
-  <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/xm-constants.png">
+  <img src="/media/xm-constants.png">
 </kbd>
 
 After the integration has been installed, these should be changed in Twilio under environment variables.
@@ -322,7 +321,7 @@ After changing environment variables in Twilio you will need to Click
 **Deploy All** button before the new variables will be used.
 
 <kbd>
-  <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/twilio-env.png">
+  <img src="/media/twilio-env.png">
 </kbd>
 
 | **Speak Phrase**       | **Description**                                                                                                                                                                                                                                                                                                               |
@@ -378,9 +377,9 @@ After changing environment variables in Twilio you will need to Click
 
 1. Search "Buy a Number" and click "Buy a Number":
 
-   <kbd>
-     <img src="/media/Buy-Number.png" width="250px">
-   </kbd>
+<kbd>
+  <img src="/media/Buy-Number.png" width="250px">
+</kbd>
 
 2. Perform a Twilio phone number search.
 
@@ -390,10 +389,11 @@ After changing environment variables in Twilio you will need to Click
 
 3. Make sure the number you select has Voice Capabilities and Buy Number.
 
-   <kbd>
-     <img src="/media/Buy-Phone.png" width="550px">
-   </kbd>
+<kbd>
+  <img src="/media/Buy-Phone.png" width="550px">
+</kbd>
 
+`
 This integraiton will work with a Twilio Trial account but will have the following limitations.
 
 1. A message about using a Twilio Trial account will play before your integation scripts run.
@@ -414,8 +414,8 @@ We need your Twilio authentication credentials for xMatters to communicate with 
 5. Click Components and go to Endpoints
 6. Set authentication for Twilio and Twilio Upload Service Endpoints.
 
-Twilio Account SID => Username
-Twilio Account Token => Password
+   Twilio Account SID => Username
+   Twilio Account Token => Password
 
 ## Deploy a Twilio Service using xMatters Install Integration Form
 
@@ -429,15 +429,15 @@ To deploy a funciton version to Twilio, the api request must be multipart/form-d
 1. Open the Install Integration xMatters Form. Make sure it is deployed to Web UI or you will not be able to find/use it.
 2. Set form fields appropriately.
 
-**Twilio Service Name**: This will be the name of the service created in Twilio.
+   **Twilio Service Name**: This will be the name of the service created in Twilio.
 
-**Functions to Deploy**: These are the names of the functions to create in Twilio. Currently this feature does not do anything.
+   **Functions to Deploy**: These are the names of the functions to create in Twilio. Currently this feature does not do anything.
 
 3. Click Send Message.
 
-- Re-running this form in the future will return any changed environment variables in Twilio back to the value in the corresponding xMatters constant.
-- This form does not need to target any recipients.
-- Instead of using this form, you could create a Twilio Service and add all of the Environment Variables manually.
+   - Re-running this form in the future will return any changed environment variables in Twilio back to the value in the corresponding xMatters constant.
+   - This form does not need to target any recipients.
+   - Instead of using this form, you could create a Twilio Service and add all of the Environment Variables manually.
 
 ## Configure Twilio Service
 
@@ -468,19 +468,19 @@ In this step we will be adding Twilio functions and dependencies to the service 
 5. **Copy** and **Paste** the appropriate function script into the Twilio Script editor and press **Save**.
 6. Repeat until all functions have been added.
 
-Twilio Function Scripts
+   **Twilio Function Scripts**
 
-- [xm_settings](TwilioFunctions/xm_settings.js)
-- [xm_action](TwilioFunctions/xm_action.js)
-- [xm_group](TwilioFunctions/xm_group.js)
-- [xm_record](TwilioFunctions/xm_record.js)
-- [xm_livecall](TwilioFunctions/xm_livecall.js)
-- [xm_escalate](TwilioFunctions/xm_escalate.js)
-- [xm_confirmRec](TwilioFunctions/xm_confirmRec.js)
-- [xm_shorten](TwilioFunctions/xm_shorten.js)
-- [xm_message](TwilioFunctions/xm_message.js)
-- [xm_incident](TwilioFunctions/xm_incident.js)
-- [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
+   - [xm_settings](TwilioFunctions/xm_settings.js)
+   - [xm_action](TwilioFunctions/xm_action.js)
+   - [xm_group](TwilioFunctions/xm_group.js)
+   - [xm_record](TwilioFunctions/xm_record.js)
+   - [xm_livecall](TwilioFunctions/xm_livecall.js)
+   - [xm_escalate](TwilioFunctions/xm_escalate.js)
+   - [xm_confirmRec](TwilioFunctions/xm_confirmRec.js)
+   - [xm_shorten](TwilioFunctions/xm_shorten.js)
+   - [xm_message](TwilioFunctions/xm_message.js)
+   - [xm_incident](TwilioFunctions/xm_incident.js)
+   - [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
 
 ## Configure Twilio "xm_settings" Functions
 
@@ -570,7 +570,7 @@ Further instructions [here](#get-the-xmatters-inbound-http-trigger-endpoint)
 
 <br><br>
 
-### xMatter conference bridge number
+### xMatter Conference Bridge Number
 
 ```js
 // xMatter conference bridge number
@@ -581,7 +581,7 @@ setting.xmconference = '18779595418';
 
 This is the phone number you need to call to join an xMatters bridge. It does not include the bridge number.
 
-### xMatter Conference Bridge Number
+### Transfer to Conference
 
 ```js
 // Whether the call in user should be automatically transferred to the conference bridge once it is opened by xMatters
@@ -640,11 +640,11 @@ setting.Speak_Groups = ['C.A.B. Approval', 'Cloud DevOps.', 'Database Infrastruc
 setting.NumberofGroups = setting.xMatters_Groups.length;
 ```
 
-| **Integration URLS** | |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | |
+| **Integration URLS**    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | setting.xMatters_Groups | Listing of Group Names, exactly how they are configured in xMatters. You will be able to send the xMatters notifications to any of the groups listed here. You can have up to 9 groups. If you want to target multiple groups at the same time we suggest creating a group with child groups and targeting the parent group from this integration. You could also use xMatters userID's to target individuals. If you dont want to use this option set it to setting.xMatters_Groups = []; Be sure to do the same for setting.Speak_Groups. |
-| setting.Speak_Groups | Your group names may not always be easy for the Twilio text-to-speech engine to read. This option lets you type your groups names in the same order as in **settings.xMatters_Groups** but spell them in a way that the text-to-speech engine understands. You must have the same number of groups listed here in the same order as **settings.xMatters_Groups**. Failing to do so will cause unintended behaviours. |
-| setting.NumberofGroups | The number of Groups listed inside xMatters_Groups array. Changing this will break the integration.
+| setting.Speak_Groups    | Your group names may not always be easy for the Twilio text-to-speech engine to read. This option lets you type your groups names in the same order as in **settings.xMatters_Groups** but spell them in a way that the text-to-speech engine understands. You must have the same number of groups listed here in the same order as **settings.xMatters_Groups**. Failing to do so will cause unintended behaviours.                                                                                                                        |
+| setting.NumberofGroups  | The number of Groups listed inside xMatters_Groups array. Changing this will break the integration.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 <br><br>
 
@@ -760,7 +760,7 @@ You must supervise of **Twilio_API_User** in order to select it. This user must 
 This url should be set for the **xmattersHTTP** setting inside of the Twilio function **xm_settings**.
 
 <kbd>
-  <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/xm-httpTrigger.png">
+  <img src="/media/xm-httpTrigger.png">
 </kbd>
 
 <br><br>
