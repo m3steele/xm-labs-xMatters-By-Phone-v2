@@ -45,7 +45,7 @@ exports.handler = function (context, event, callback) {
   // A verified phone number to be used as the outgoing caller ID when calling on-call agent directly
   // Instructions on how to Verify a phone number in Twilio.
   // https://support.twilio.com/hc/en-us/articles/223180048-Adding-a-Verified-Phone-Number-or-Caller-ID-with-Twilio
-  // Failing to set a Verified number here will set the iniating phone number to the caller id
+  // Failing to set a Verified number here will set the initiating phone number to the caller id
   setting.callerID = "15555555555";
 
   //***************************************
@@ -55,12 +55,12 @@ exports.handler = function (context, event, callback) {
   // Do not include trailing slash
   setting.xmatters = "https://company.cs1.xmatters.com";
 
-  // xMatters Webservice User name and password
+  // xMatters Webservice username and password
   // https://help.xmatters.com/ondemand/user/apikeys.htm
   setting.xm_user = "x-api-key-d061a0ae";
   setting.xm_pass = "9f7420d0-f938-40fd";
 
-  // This is the Inbound HTTP Trigger url for "On-Call Alert" workflow.
+  // This is the Inbound HTTP Trigger URL for "On-Call Alert" workflow.
   // Found by: Workflows => Initiate Event via Phone Call => Flows => "Initiate Event via Phone Call" Flow => Double click "Initiate by Phone Setting" Step
   // Make sure to set authenticating user to the webservice user above.
   setting.xmattersHTTP =
@@ -71,13 +71,13 @@ exports.handler = function (context, event, callback) {
   // This will show the conference phone number, assuming it is part of the messaging template body.
   setting.xmconference = "18777777777";
 
-  // Whether the call in user should be automatically transferred to the conference bridge once it is opened by xMatters
+  // Whether the call-in user should be automatically transferred to the conference bridge once it is opened by xMatters
   setting.transfer_to_bridge = true;
 
   // This option allows you to set a default severity for incidents.
   // This can be set to "1","2","3","4","5" or ""
-  // Setting to a number will make that the default severity.
-  // Setting to am empty string “” will prompt the user and ask for the severity of the incident
+  // Setting this to a number (1 to 5) will make that the default severity.
+  // Setting this to an empty string "" will prompt the user and ask for the severity of the incident
   setting.defaultSeverity = ""; // "1","2","3","4","5" or ""
 
   // List of xMatters userId's that are allowed to initiate this integration
@@ -92,8 +92,7 @@ exports.handler = function (context, event, callback) {
   // You can add additional Groups by adding parameters to the array below.
   // You must add at least one group
   // Providing a single group will automatically target that group and Group selection will be skipped.
-  // An empty array will require that you add groups / users as default recipients in the xMatters form layout.
-  // This array must have the same number of elements as the Speak_Group array below.
+  // This array must have the same number of elements and be in the same order as the xMatters_Groups array above.
   setting.xMatters_Groups = [
     "CAB Approval",
     "Cloud DevOps",
@@ -102,8 +101,8 @@ exports.handler = function (context, event, callback) {
   ];
 
   // Set the Twilio Group Name.
-  // You can add additional punctuation, spaces, dashes, and upper case letters to group names to help the text to speach engine pronounce it better.
-  // This arry must have the same number of elements as the xMatters_Groups array above.
+  // You can add additional punctuation, spaces, dashes and upper case letters to group names to help the text to speech engine pronounce it better.
+  // This array must have the same number of elements as the xMatters_Groups array above.
   setting.Speak_Groups = [
     "C.A.B. Approval",
     "Cloud DevOps.",
@@ -119,9 +118,9 @@ exports.handler = function (context, event, callback) {
   //***************************************
 
   // Bitley Access Token
-  // This setting is HIGHLY recommended. Failing to provide this setting will result in very long urls and ruin the effectivness default SMS messages.
-  // You could use an alternate url shortening service but code changes would be required in xm_shorten script
-  // If you do not want to use bitly to shorten urls, provide an invalid token or an empty value.
+  // This setting is HIGHLY recommended. Failing to provide this setting will result in very long URLs and ruin the effectiveness default SMS messages.
+  // You could use an alternate URL shortening service, but code changes would be required in xm_shorten script
+  // If you do not want to use bitly to shorten URLs, provide an invalid token or an empty value.
   setting.bitly_token = "b58207fe58966c3";
 
   //***************************************
@@ -136,12 +135,12 @@ exports.handler = function (context, event, callback) {
   // https://icanhazdadjoke.com/api
   // This is used to kill time while the integration transcribes audio to text.
   // Random jokes will play while you wait to relieve stress and make your day better.
-  // This feature is called in /xm_message script. Disabling this feature will play random phrases instead so the user isnt confused about the wait
+  // This feature is called in /xm_message script. Disabling this feature will play random phrases instead so the user isn't confused about the wait
   setting.jokeUrl = "https://icanhazdadjoke.com";
 
   // Wait Phrases
   // Phrases to play while the user is waiting.
-  // Phrases will be played in order that they appear behlow.
+  // Phrases will be played in order that they appear below.
   // Add additional phrases if you'd like.
   // Depending on the time it takes to transcribe audio, not all phrases will play.
   waitPhrase = [];
@@ -160,7 +159,7 @@ exports.handler = function (context, event, callback) {
   //***************************************
 
   // Generally, it is not recommended that you make changes to these settings.
-  // These settings are used to construct the phrases spoken to the user while inteacting with this integration
+  // These settings are used to construct the phrases spoken to the user while interacting with this integration
 
   // These phrases will be used if there are no groups configured in setting.xMatters_Groups and Speak_Groups.
   if (setting.NumberofGroups === 1) {
@@ -184,7 +183,7 @@ exports.handler = function (context, event, callback) {
   // DO NOT MAKE CHANGES BELOW THIS COMMENT
   //***************************************
 
-  // This defines the path for each of the functions in this integrtion.
+  // This defines the path for each of the functions in this integration.
   // Values here must match the function names in Twilio.
 
   setting.xm_settings = "/xm_settings";

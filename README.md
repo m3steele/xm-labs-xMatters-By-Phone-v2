@@ -46,11 +46,11 @@ _Version 2 of the integration has many new features and quality of life enhancem
   - [xm_incident](TwilioFunctions/xm_incident.js)
   - [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
 
-- [xMatters Initiate Event via Phone Call Workflow](xMattersPlan/InitiateEventviaPhoneCallv2.zip)
+- [xMatters Initiate Event via Phone Workflow](xMattersPlan/InitiateEventviaPhoneCallv2.zip)
 
 # How it works
 
-- Calling a Twilio Voice enabled phone number will allow you to create a new xMatters event (Alert, conference, Incident, live call) targeting a group of your choice.
+- Calling a Twilio Voice enabled phone number will allow you to create a new xMatters event (Alert, Conference, Incident, Livecall) targeting a group of your choice.
 - This integration initiates a Twilio function that will play a series of prompts to the caller.
 - The caller can press digits on their phone to control the xMatters event that is created.
 - The user can record a message over the phone. The audio recording is transcribed and an mp3 audio file is stored on Twilio.
@@ -61,7 +61,7 @@ _Version 2 of the integration has many new features and quality of life enhancem
 - You can connect the call-in user directly to the conference bridge as soon as xMatters opens it. No need to call back into the bridge.
 - You can connect directly to the primary on call for a group and your call will escalate to the next on call if the phone is not answered.
 - You can predefine up to 9 xMatters groups that can be target with your notification. You can select the group you would like to target using xMatters from phone prompts.
-- The content of the message can be configured in the xMatters communication plan.
+- The content of the message can be configured in the xMatters workflow.
 
 ## Integration Function Workflow
 
@@ -281,7 +281,7 @@ The integration username and password will be needed when configuring the Twilio
 
 The next step is to import the Workflow
 
-To import the communication plan:
+To import the workflow:
 
 1. In the target xMatters system, on the **Workflows** tab, click **Import**.
 2. Click **Browse**, and then locate the downloaded workflow: [xMatters Initiate Event via Phone Call Workflow](xMattersPlan/InitiateEventviaPhoneCall.zip)
@@ -407,7 +407,7 @@ You should upgrade your Twilio account to a paid account.
 
 We need your Twilio authentication credentials for xMatters to communicate with Twilio.
 
-1. Go to Twilio [Admin Console] (https://www.twilio.com/console)
+1. Go to Twilio [Admin Console](https://www.twilio.com/console)
 2. Copy Account SID and Account Token. These will act as your username and password.
 3. Open the Initiate Event via Phone Call v2 workflow in xMatters.
 4. Click Flows tab.
@@ -504,7 +504,7 @@ You can include whatever types that you would like the integration to use.
 You must include at least one item.
 
 - **Alert** : Allows creation of an xMatters Event / Alert over the phone.
-- **Conference"** : Allows creation of an xMatters Conference Bridge over the phone.
+- **Conference** : Allows creation of an xMatters Conference Bridge over the phone.
 - **Incident** : Allows creation of an xMattersIncident over the phone.
 - **Oncall** : Allows speaking directly with the primary on-call of a selected group.
 
@@ -641,13 +641,12 @@ Authorized_Users = ['userid1', 'userid2', 'userid3'];
 // You can add additional Groups by adding parameters to the array below.
 // You must add at least one group
 // Providing a single group will automatically target that group and Group selection will be skipped.
-// An empty array will require that you add groups / users as default recipients in the xMatters form layout.
 // This array must have the same number of elements as the Speak_Group array below.
 setting.xMatters_Groups = ['CAB Approval', 'Cloud DevOps', 'Database Infrastructure'];
 
 // Set the Twilio Group Name.
 // You can add additional punctuation, spaces, dashes and upper case letters to group names to help the text to speech engine pronounce it better.
-// This array must have the same number of elements as the xMatters_Groups array above.
+// This array must have the same number of elements and be in the same order as the xMatters_Groups array above.
 setting.Speak_Groups = ['C.A.B. Approval', 'Cloud DevOps.', 'Database Infrastructure'];
 
 // Do not change this setting or the integration will not work.
