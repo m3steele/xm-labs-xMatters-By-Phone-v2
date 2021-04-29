@@ -735,6 +735,8 @@ setting.bitly_token = 'scasoiueco23a432jcndl3s43a4cjdsalijfaweiud';
 
 <br><br>
 
+### Hold Music Settings
+
 ```js
 //***************************************
 // HOLD MUSIC SETTINGS
@@ -762,6 +764,8 @@ or
 Use the sample holdMusic.xml file to build your own custom hold music.
 In Twilio click **Add -> Upload** a File or **Add => Asset** and copy the content of **holdMusic.xml** file.
 Edit this file with links to your own hold music.
+
+<br><br>
 
 ### Message Phrase Settings
 
