@@ -19,6 +19,20 @@ _Version 2 of the integration has many new features and quality of life enhancem
 - Easily change the voice used for speaking text and take advantage of the newest technologies around natural speech.
 - Simplified control of whether call in user is authorized to use the integration.
 
+**April 29, 2021 Updates**
+
+- New method to determine if a human or an answering machine has answered the phone during live calling.
+- When placing a live call, the initiating user is now put in a call queue and music is played while the integration looks for an on-call resource.
+- On-call resources are instructed to press a digit before connecting them to the initiating user. This ensures that a human has answered the phone rather than an answering machine.
+- While an on-call user is waiting, they will be prompted as the integration calls on-call resources. "Calling the next on-call resource, John Smith, please stand by.."
+- If no on-call resources are found, the user will hear "None of the on-call agents in the <group name> group answered. Press 1, to alert the team they missed your call via sms and email. Press 2, to return to the main menu. Hang-up to try again later."
+- A missed call alert workflow is now avaliable at the end of live calling. This will inform the on-call group via email and sms that they missed a call from xMatters by phone integration. The initiating user's phone number will be included in the message so an on-call resource can call them directly.
+- Several new settings added including: noanswerHTTP,holdMusic, xm_endqueue, xm_connect,xm_nextoncall.
+- New twilio functions added including: xm_endqueue.js, xm_connect.js, xm_nextoncall.js, holdMusic.xml
+- xm_escalate.js function re-written
+- xMatters install workflow added to automate parts of Twilio service creation
+- Fixed an install script bug causing undefined for all Twilio functions.
+
 <kbd>
   <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
 </kbd>
@@ -40,11 +54,15 @@ _Version 2 of the integration has many new features and quality of life enhancem
   - [xm_record](TwilioFunctions/xm_record.js)
   - [xm_livecall](TwilioFunctions/xm_livecall.js)
   - [xm_escalate](TwilioFunctions/xm_escalate.js)
+  - [xm_nextoncall](TwilioFunctions/xm_nextoncall.js)
+  - [xm_connect](TwilioFunctions/xm_connect.js)
   - [xm_confirmRec](TwilioFunctions/xm_confirmRec.js)
   - [xm_shorten](TwilioFunctions/xm_shorten.js)
   - [xm_message](TwilioFunctions/xm_message.js)
   - [xm_incident](TwilioFunctions/xm_incident.js)
   - [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
+  - [xm_endqueue](TwilioFunctions/xm_endqueue.js)
+  - [holdMusic.xml](TwilioFunctions/holdMusic.xml)
 
 - [xMatters Initiate Event via Phone Workflow](xMattersPlan/InitiateEventviaPhoneCallv2.zip)
 
@@ -144,33 +162,62 @@ Calling Admin Group, primary on call "John Smith", good luck with your problem.
 
 7. Twilio Function **xm_escalate** is initiated.
 
-   - Handles escalations to the next on-call when phone is not answer within 17 seconds.
-   - An answering machine will stop the process and will result in not connecting with someone live. - 17 seconds is typically short enough that voicemail will not answer. This setting can be changed. - The system adds a 5 second buffer to the timeout setting provided. 12 seconds + 5 second buffer = 17 seconds.
+   - Handles escalations between on-call resources.
+   - This script will sequentially call each of the on-call resource and direct the call to **xm_connect** when a resource answers.
+   - When a resource does not answer and the next resource is about to be called, **xm_nextoncall** is called.
+   - If no resources answers, **xm_endqueue** is called.
 
-     Line 27: ... **'timeout':12** ...
+8. Twilio Function **xm_connect** is initiated.
+
+   - Plays a message to the on-call resource who answers the phone.
+   - Waits for digits to be entered indicating a human has answered the call.
+   - Connects on-call resource to the initiating user when a digit is recieved.
 
 ```
-Calling the next on call, "Henry Stephens", good luck.
-Calling the next on call, "nth member", good luck.
-If no member answers the phone, caller is sent back to the xm_action.
+"Hello John Smith, you're on-call in the Network group and someone needs your help. Press any digit to connect with the caller."
 ```
 
-8. Twilio Function **xm_record** is initiated.
-   - Prompts the user to record a message over the phone.
+9. Twilio Function **xm_nextoncall** is initiated.
+
+   - Interupts onhold music each time new on-call resource is called.
+   - Reads a message letting the caller know the on-call resource we are about to call.
+
+```
+ Calling the next on call resource, "Henry Stephens", please stand by.."
+ Calling the next on call resource, "John Smith", please stand by.."
+ Calling the next on call, "nth member", please stand by.."
+```
+
+10. Twilio Function **xm_endqueue** is initiated.
+
+- If no on-call resource answers and dials a digit the initiating caller will be directed here.
+- Plays a prompts letting user know that no on-call reswource was found.
+- 1.  Create an xMatters missed call alert via sms and email to the users who did not answer. Provides the initiating users phone number so they can be called.
+- 2.  Allows to return to main menu
+- Hang up to end the call
+
+```
+"None of the on-call agents in the <group name> group answered. Press 1, to alert the team they missed your call via sms and email. Press 2, to return to the main menu. Hang-up to try again later."
+```
+
+11. Twilio Function **xm_record** is initiated.
+
+- Prompts the user to record a message over the phone.
 
 ```
 Record your message after the beep. Press 1 if you are happy with your recording, any other key to restart.
 ```
 
-9. Twilio Function **xm_confirm** is initiated.
-   - Handles the case where user wants to re-record the message.
-   - Moves the script to the next function if the user is happy with the recording.
+12. Twilio Function **xm_confirm** is initiated.
+
+- Handles the case where user wants to re-record the message.
+- Moves the script to the next function if the user is happy with the recording.
 
 ```
 Record your message after the beep. Press 1 if you are happy with your recording, any other key to restart.
 ```
 
-10. Twilio Function **xm_shorten** is initiated.
+13. Twilio Function **xm_shorten** is initiated.
 
 - Sends the recording URL to Bitly where the long form URL is shortened.
 - If there is an error shortening the URL we will continue on using the long version of the URL.
@@ -183,7 +230,7 @@ Converted to:
 http:/bit.ly/2sjdsis2
 ```
 
-11. Twilio Function **xm_message** is initiated.
+14. Twilio Function **xm_message** is initiated.
 
 - Plays a message while user is waiting for the recording transcription to complete.
 - Message can be configured using **waitPhrasetype** setting. Can be either "joke", "phrase" or "static".
@@ -230,13 +277,13 @@ http:/bit.ly/2sjdsis2
     - Oops, something went wrong. The event has not been sent. You will need to send this event directly from xMatters.
     ```
 
-12. Twilio Function **xm_bridgeforward** is initiated.
+15. Twilio Function **xm_bridgeforward** is initiated.
 
 - **transfer_to_bridge** setting allows the call-in user to be automatically transferred to the xMatters conference bridge when it is ready.
 - setting **transfer_to_bridge** = _true_ will transfer to the xMatters bridge when it is ready
 - setting **transfer_to_bridge** = _false_ will terminate the phone call once the xMatters event is created
 
-13. xMatters Inbound HTTP Trigger (Initiate by Phone)
+16. xMatters Inbound HTTP Trigger (Initiate by Phone)
 
 - This inbound HTTP trigger starts the xMatters Workflow
 - You can customize this Flow and integrate with other applications.
@@ -293,7 +340,7 @@ To import the workflow:
 8. In the **Web Service** drop-down list, click **Sender Permissions**.
 9. Add the **Twilio_API_User** you created above, and then click **Save Changes**.
 
-Repeat steps 6 to 9 for **On-Call Resource Conference** form.
+Repeat steps 6 to 9 for **On-Call Resource Conference** form and **No Answer** form.
 
 **Special Note:** The **Twilio_API_User** will always initiate the xMatters event for this integration. A separate setting inside the Twilio **xm_settings** function will control whether the calling phone/person is allowed to initiate an xMatters event using this integration. Assuming the person is calling from a phone with a caller ID matching a user in xMatters and the **xm_settings** configuration, an event will be created by the **Twilio_API_User**.
 
@@ -400,6 +447,7 @@ This integration will work with a Twilio Trial account but will have the followi
 2. You will only be able to make outgoing calls to Verified Caller ID's.
    [Twilio => Phone Numbers => Verified Caller IDs](https://www.twilio.com/console/phone-numbers/verified)
    [Twilio Help](https://support.twilio.com/hc/en-us/articles/223180048-Adding-a-Verified-Phone-Number-or-Caller-ID-with-Twilio)
+3. You will not be able to connect to conferences bridfges automatically unless you verify the xMaters conference bridge number. You will not be able to verify the xMatters conference bridge number with Twilio.
 
 You should upgrade your Twilio account to a paid account.
 
@@ -424,6 +472,7 @@ This will programmatically create a Twilio Service and create all of the require
 Before doing this step you should make sure you have configured xMatters Workflow Constants and xMatters endpoints for Twilio.
 
 In the future this step may be enhanced to also deploy function versions (script) in Twilio and completely automate the installation process.
+
 To deploy a function version to Twilio, the API request must be multipart/form-data and this is not currently supported by xMatters.
 
 1. Open the Install Integration xMatters Form. Make sure it is deployed to Web UI or you will not be able to find/use it.
@@ -470,17 +519,21 @@ In this step we will be adding Twilio functions and dependencies to the service 
 
    **Twilio Function Scripts**
 
-   - [xm_settings](TwilioFunctions/xm_settings.js)
-   - [xm_action](TwilioFunctions/xm_action.js)
-   - [xm_group](TwilioFunctions/xm_group.js)
-   - [xm_record](TwilioFunctions/xm_record.js)
-   - [xm_livecall](TwilioFunctions/xm_livecall.js)
-   - [xm_escalate](TwilioFunctions/xm_escalate.js)
-   - [xm_confirmRec](TwilioFunctions/xm_confirmRec.js)
-   - [xm_shorten](TwilioFunctions/xm_shorten.js)
-   - [xm_message](TwilioFunctions/xm_message.js)
-   - [xm_incident](TwilioFunctions/xm_incident.js)
-   - [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
+- [xm_settings](TwilioFunctions/xm_settings.js)
+- [xm_action](TwilioFunctions/xm_action.js)
+- [xm_group](TwilioFunctions/xm_group.js)
+- [xm_record](TwilioFunctions/xm_record.js)
+- [xm_livecall](TwilioFunctions/xm_livecall.js)
+- [xm_escalate](TwilioFunctions/xm_escalate.js)
+- [xm_nextoncall](TwilioFunctions/xm_nextoncall.js)
+- [xm_connect](TwilioFunctions/xm_connect.js)
+- [xm_confirmRec](TwilioFunctions/xm_confirmRec.js)
+- [xm_shorten](TwilioFunctions/xm_shorten.js)
+- [xm_message](TwilioFunctions/xm_message.js)
+- [xm_incident](TwilioFunctions/xm_incident.js)
+- [xm_bridgeforward](TwilioFunctions/xm_bridgeforward.js)
+- [xm_endqueue](TwilioFunctions/xm_endqueue.js)
+- [holdMusic.xml](TwilioFunctions/holdMusic.xml)
 
 ## Configure Twilio "xm_settings" Functions
 
@@ -573,12 +626,20 @@ Further instructions [here](#create-an-xmatters-integration-user)
 // This is the Inbound HTTP Trigger URL for "On-Call Alert" workflow.
 // Found by: Workflows => Initiate Event via Phone Call => Flows => "Initiate Event via Phone Call" Flow => Double click "Initiate by Phone Setting" Step
 // Make sure to set authenticating user to the webservice user above.
-setting.xmattersHTTP = 'https://company.cs1.xmatters.com/api/integration/1/functions/e6deb630-5172-xxx/triggers?apiKey=91643be0-b878-4317-xxx';
+setting.xmattersHTTP = '/api/integration/1/functions/e6deb630-5172-xxx/triggers?apiKey=91643be0-b878-4317-xxx';
+```
+
+```js
+// This is the Flow designer http trigger to alert group if no answer"
+setting.noanswerHTTP = '/api/integration/1/functions/8b1e9be8-bd3b-4143/triggers?apiKey=7ed099c5-5b27';
 ```
 
 | **Integration URLS** | [Get the xMatters Inbound Integration Endpoints](#get-the-xmatters-inbound-integration-endpoints) |
 | -------------------- | ------------------------------------------------------------------------------------------------- |
 | setting.xmattersHTTP | The inbound HTTP trigger endpoint ULR for the On-Call Alert workflow.                             |
+| setting.noanswerHTTP | The inbound HTTP trigger endpoint ULR for the No Answwer workflow.                                |
+
+DO NOT INCLUDE THE BASE URL, THIS MUST THE THE ENDPOINT URL AFTER: https://company.cs1.xmatters.com
 
 Further instructions [here](#get-the-xmatters-inbound-http-trigger-endpoint)
 
@@ -673,6 +734,34 @@ setting.bitly_token = 'scasoiueco23a432jcndl3s43a4cjdsalijfaweiud';
 - Use your Bitly Access Token generated [here](#create-a-bitly-account).
 
 <br><br>
+
+```js
+//***************************************
+// HOLD MUSIC SETTINGS
+//***************************************
+
+// Hold music is played for the initiating user while they wait for the integration to find an on-call resource.
+// This url needs to point to a twiml script that contains music files.
+// You can use any of the following twiml scripts from Twilio labs: https://www.twilio.com/labs/twimlets/holdmusic
+// Fair warning, the music contained in these scripts might make your ears bleed.
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.electronica
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.guitars
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.newage
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock
+// http://twimlets.com/holdmusic?Bucket=com.twilio.music.soft-rock
+// Alternatively, provide your own hold music by customizing the holdMusic.xml file and referencing it below.
+setting.holdMusic = 'https://xmattersbyphone-3972.twil.io/holdMusic.xml';
+```
+
+Just set to one of the included url's above.
+
+or
+
+Use the sample holdMusic.xml file to build your own custom hold music.
+In Twilio click **Add -> Upload** a File or **Add => Asset** and copy the content of **holdMusic.xml** file.
+Edit this file with links to your own hold music.
 
 ### Message Phrase Settings
 

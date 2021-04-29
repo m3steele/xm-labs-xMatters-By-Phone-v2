@@ -352,35 +352,33 @@ exports.handler = function (context, event, callback) {
               // Call the Primary on call
               else if (results.length > 0 && results[0].type === "PERSON") {
                 console.log("Has Primary oncall members");
+               
                 var index = parseInt(event.Digits) - 1;
-                recipientGroup = settings.Speak_Groups[index];
-
+                var recipientGroup = settings.Speak_Groups[index];
+                settings.recipientGroup = settings.Speak_Groups[index];
+                
                 // Tell user who we are about to call
                 twiml.say(
                   {
                     voice: settings.voice,
                   },
-                  "Calling " +
-                    recipientGroup +
-                    ", primary on call " +
+                  "Sure, Please stand by while I connect you to the " +
+                      recipientGroup + " group, primary on call " +
                     results[0].fullName +
                     "..., good luck with your problem!"
                 );
-                // Make the call to primary on call
-                const dial = twiml.dial({
-                  callerId: settings.callerID,
-                  timeout: 12,
-                  action:
-                    "https://" +
+                
+                // Redirect to API Create Call script
+                twiml.redirect(
+                  "https://" +
                     context.DOMAIN_NAME +
                     settings.xm_escalate +
                     "?setting=" +
                     encodeURI(JSON.stringify(settings)) +
                     "&targets=" +
                     encodeURI(JSON.stringify(results)) +
-                    "&escalation=0",
-                });
-                dial.number(results[0].voice);
+                    "&escalation=0"
+                );
 
                 callback(null, twiml);
               }
@@ -422,7 +420,7 @@ exports.handler = function (context, event, callback) {
               targets[p].targetName +
               "/devices",
             {
-              headers: {
+              headers: {conn
                 accept: "application/json",
                 Authorization:
                   "Basic " +

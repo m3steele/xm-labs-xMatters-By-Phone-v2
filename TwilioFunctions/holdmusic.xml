@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+<Play>http://com.twilio.music.guitars.s3.amazonaws.com/Pitx_-_Long_Winter.mp3</Play>
+<Say>Thanks for holding, we are still looking for an avaliable on-call user.</Say>
+<Play>http://com.twilio.music.ambient.s3.amazonaws.com/aerosolspray_-_Living_Taciturn.mp3</Play>
+<Say>Thanks for holding, we are still looking for an avaliable on-call user.</Say>
+<Play>http://com.twilio.music.rock.s3.amazonaws.com/nickleus_-_original_guitar_song_200907251723.mp3</Play>
+<Say>Thanks for holding, we are still looking for an avaliable on-call user.</Say>
+<Play>http://com.twilio.music.electronica.s3.amazonaws.com/teru_-_110_Downtempo_Electronic_4.mp3</Play>
+<Say>Thanks for holding, we are still looking for an avaliable on-call user.</Say>
+<Redirect/>
+</Response>

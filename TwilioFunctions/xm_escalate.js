@@ -2,58 +2,102 @@ exports.handler = function (context, event, callback) {
   console.log("ESCALATE");
   var settings = JSON.parse(decodeURI(event.setting));
   var targets = JSON.parse(decodeURI(event.targets));
-  let twiml = new Twilio.twiml.VoiceResponse();
 
+  let twiml = new Twilio.twiml.VoiceResponse();
+  const client = context.getTwilioClient();
   var escalation = parseInt(event.escalation, 10) + 1;
 
-  if (event.DialCallStatus === "no-answer" && targets.length > escalation) {
-    console.log(
-      "Escalation to the next on call " + targets[escalation].fullName
-    );
+  // Make call to on-cal agent
+  if (targets.length > parseInt(event.escalation, 10)) {
+    console.log("==============MAKING API CALL===============");
 
-    // Tell user who we are about to call
-    twiml.say(
-      { voice: settings.voice },
-      "Calling the next on call " +
-        targets[escalation].fullName +
-        "..., good luck!"
-    );
-    // Make the call to primary on call
-    const dial = twiml.dial({
-      callerId: settings.callerID,
-      timeout: 12,
-      action:
-        "https://" +
-        context.DOMAIN_NAME +
-        settings.xm_escalate +
-        "?setting=" +
-        encodeURI(JSON.stringify(settings)) +
-        "&targets=" +
-        encodeURI(JSON.stringify(targets)) +
-        "&escalation=" +
-        escalation,
-    });
-    dial.number(targets[escalation].voice);
-    callback(null, twiml);
-  } else if (event.DialCallStatus === "failed" && escalation === 1) {
-    twiml.say({ voice: settings.voice }, context.Emptyoncall_Phrase);
-    twiml.redirect(
+    var payload = {};
+    settings.thisTarget = "";
+    payload.url =
       "https://" +
-        context.DOMAIN_NAME +
-        settings.xm_action +
-        "?setting=" +
-        encodeURI(JSON.stringify(settings))
+      context.DOMAIN_NAME +
+      settings.xm_connect +
+      "?setting=" +
+      encodeURI(JSON.stringify(settings)) +
+      "&targets=" +
+      encodeURI(JSON.stringify(targets)) +
+      "&escalation=" +
+      parseInt(event.escalation, 10);
+    payload.statusCallbackEvent = ["completed"];
+    payload.statusCallback =
+      "https://" +
+      context.DOMAIN_NAME +
+      settings.xm_escalate +
+      "?setting=" +
+      encodeURI(JSON.stringify(settings)) +
+      "&targets=" +
+      encodeURI(JSON.stringify(targets)) +
+      "&escalation=" +
+      escalation;
+    payload.method = "POST";
+    payload.from = settings.callerID;
+    payload.timeout = "20";
+    payload.to = targets[parseInt(event.escalation, 10)].voice;
+
+    twiml.enqueue(
+      {
+        waitUrl: settings.holdMusic,
+      },
+      settings.parentSid
     );
-    callback(null, twiml);
+    // Place call to oncall resource
+    client.calls
+      .create(payload)
+      .then((call) => {
+        return call;
+      })
+      .then((res) => {
+        console.log("Call created " + JSON.stringify(res));
+
+        // If escalating update caller with next on-call resource name
+        if (parseInt(event.escalation, 10) > 0) {
+          client
+            .calls(settings.parentSid)
+            .update({
+              url:
+                "https://" +
+                context.DOMAIN_NAME +
+                settings.xm_nextoncall +
+                "?setting=" +
+                encodeURI(JSON.stringify(settings)) +
+                "&name=" +
+                encodeURI(targets[parseInt(event.escalation, 10)].fullName) +
+                "&targets=" +
+                encodeURI(JSON.stringify(targets)) +
+                "&escalation=" +
+                parseInt(event.escalation, 10),
+            })
+            .then((res) => {
+              callback(null, twiml);
+            });
+        } else {
+          callback(null, twiml);
+        }
+      });
   } else {
-    twiml.say({ voice: settings.voice }, context.Noanswer_Phrase);
-    twiml.redirect(
-      "https://" +
-        context.DOMAIN_NAME +
-        settings.xm_action +
-        "?setting=" +
-        encodeURI(JSON.stringify(settings))
-    );
-    callback(null, twiml);
+    console.log("No more users on-call");
+
+    client
+      .calls(settings.parentSid)
+      .update({
+        url:
+          "https://" +
+          context.DOMAIN_NAME +
+          settings.xm_endqueue +
+          "?setting=" +
+          encodeURI(JSON.stringify(settings)) +
+          "&group=" +
+          encodeURI(settings.recipientGroup),
+      })
+      .then((res) => {
+        console.log("Call terminated " + JSON.stringify(res));
+
+        callback(null, twiml);
+      });
   }
-}; // close handler
+};

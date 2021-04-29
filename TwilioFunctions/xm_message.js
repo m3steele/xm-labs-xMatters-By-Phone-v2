@@ -27,7 +27,7 @@ exports.handler = function (context, event, callback) {
       console.log("Transcrition status: " + json.transcriptions[0].status);
 
       if (json.transcriptions[0].status === "completed") {
-        var xm_url = settings.xmattersHTTP;
+        var xm_url = settings.xmatters + settings.xmattersHTTP;
         twiml.say({ voice: settings.voice }, context.Record_Success_Phrase);
 
         // Add last parameters to event
