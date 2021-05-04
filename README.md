@@ -556,11 +556,12 @@ setting.alertTypes = ['Alert', 'Conference', 'Incident', 'Livecall'];
 This setting controls what actions the integration will allow.
 You can include whatever types that you would like the integration to use.
 You must include at least one item.
+The order of this array determines the order thye will appear in the main menu.
 
 - **Alert** : Allows creation of an xMatters Event / Alert over the phone.
 - **Conference** : Allows creation of an xMatters Conference Bridge over the phone.
 - **Incident** : Allows creation of an xMattersIncident over the phone.
-- **Oncall** : Allows speaking directly with the primary on-call of a selected group.
+- **Licecall** : Allows speaking directly with the primary on-call of a selected group.
 
 ### Twilio Voice Model
 

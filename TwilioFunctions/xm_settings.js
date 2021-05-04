@@ -27,7 +27,8 @@ exports.handler = function (context, event, callback) {
   // "Alert" : Allows creation of an xMatters Event / Alert over the phone.
   // "Conference" : Allows creation of an xMatters Conference Bridge over the phone.
   // "Incident" :  Allows creation of an xMattersIncident over the phone.
-  // "Oncall" : Allows speaking directly with the primary on-call of a selected group.
+  // "Livecall" : Allows speaking directly with the primary on-call of a selected group.
+  // The order of this array determines the order of the menu.
   setting.alertTypes = ['Alert', 'Conference', 'Incident', 'Livecall'];
 
   //***************************************
