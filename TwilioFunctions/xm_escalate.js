@@ -7,8 +7,9 @@ exports.handler = function (context, event, callback) {
   const client = context.getTwilioClient();
   let escalation = parseInt(event.escalation, 10) + 1;
 
-  // catch callback for completed calls that we dont want to do anythign with
-  if (event.cb && event.CallStatus !== 'no-answer') {
+  // catch callback for completed calls that we dont want to do anythign with.
+  // Allow no-answer and busy to call next on-call resource
+  if (event.cb && event.CallStatus !== 'no-answer' && event.CallStatus !== 'busy') {
     console.log('Caught callback');
     return callback(null, twiml);
   }
@@ -16,13 +17,14 @@ exports.handler = function (context, event, callback) {
   else {
     // event.CallStatus === "in-progress" && !event.nodigits : First initiating call
     // event.CallStatus === "completed" && event.nodigits === "true" : Calls that were answered but no digits press
-    //  event.CallStatus === "no-answer" : Calls that are not answered and no digits
+    //  event.CallStatus === "no-answer"  || event.CallStatus === "busy" : Calls that are not answered and no digits or phone is busy
     if (
       targets.length > parseInt(event.escalation, 10) &&
       parseInt(event.escalation, 10) < settings.escLevels &&
       ((event.CallStatus === 'in-progress' && !event.nodigits) ||
         (event.CallStatus === 'completed' && event.nodigits === 'true') ||
-        event.CallStatus === 'no-answer')
+        event.CallStatus === 'no-answer' ||
+        event.CallStatus === 'busy')
     ) {
       console.log('==============MAKING API CALL===============');
 
