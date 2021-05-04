@@ -1,18 +1,18 @@
-var got = require("got");
+let got = require('got');
 exports.handler = function (context, event, callback) {
-  console.log("SHORTEN");
-  var settings = JSON.parse(decodeURI(event.setting));
+  console.log('SHORTEN');
+  let settings = JSON.parse(decodeURI(event.setting));
   let twiml = new Twilio.twiml.VoiceResponse();
 
-  var bitly = {};
+  let bitly = {};
   bitly.long_url = event.RecordingUrl;
 
   got
-    .post("https://api-ssl.bitly.com/v4/shorten", {
+    .post('https://api-ssl.bitly.com/v4/shorten', {
       body: JSON.stringify(bitly),
       headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + settings.bitly_token,
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + settings.bitly_token,
       },
     })
     .then(function (response) {
@@ -20,24 +20,24 @@ exports.handler = function (context, event, callback) {
       console.log(shorturl.link);
 
       twiml.redirect(
-        "https://" +
+        'https://' +
           context.DOMAIN_NAME +
           settings.xm_message +
-          "?setting=" +
+          '?setting=' +
           encodeURI(JSON.stringify(settings)) +
-          "&what=" +
+          '&what=' +
           event.what +
-          "&severity=" +
+          '&severity=' +
           event.severity +
-          "&recipient=" +
+          '&recipient=' +
           encodeURI(event.recipient) +
-          "&RecordingUrl=" +
+          '&RecordingUrl=' +
           event.RecordingUrl +
-          "&shorturl=" +
+          '&shorturl=' +
           shorturl.link +
-          "&Message_Phrase=" +
+          '&Message_Phrase=' +
           encodeURI(event.Message_Phrase) +
-          "&RecordingSid=" +
+          '&RecordingSid=' +
           event.RecordingSid
       );
       callback(null, twiml);
@@ -45,26 +45,26 @@ exports.handler = function (context, event, callback) {
     .catch(function (error) {
       // Boo, there was an error.
       twiml.say({ voice: settings.voice }, context.Shorten_Fail_Phrase);
-      console.log("About to redirect to message");
+      console.log('About to redirect to message');
       twiml.redirect(
-        "https://" +
+        'https://' +
           context.DOMAIN_NAME +
           settings.xm_message +
-          "?setting=" +
+          '?setting=' +
           encodeURI(JSON.stringify(settings)) +
-          "&what=" +
+          '&what=' +
           event.what +
-          "&severity=" +
+          '&severity=' +
           event.severity +
-          "&recipient=" +
+          '&recipient=' +
           encodeURI(event.recipient) +
-          "&RecordingUrl=" +
+          '&RecordingUrl=' +
           event.RecordingUrl +
-          "&shorturl=" +
+          '&shorturl=' +
           event.RecordingUrl +
-          "&Message_Phrase=" +
+          '&Message_Phrase=' +
           encodeURI(event.Message_Phrase) +
-          "&RecordingSid=" +
+          '&RecordingSid=' +
           event.RecordingSid
       );
 

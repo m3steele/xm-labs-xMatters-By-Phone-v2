@@ -1,33 +1,24 @@
-var got = require("got");
+let got = require('got');
 exports.handler = function (context, event, callback) {
-  console.log("MESSAGE");
-  var settings = JSON.parse(decodeURI(event.setting));
+  console.log('MESSAGE');
+  let settings = JSON.parse(decodeURI(event.setting));
   let twiml = new Twilio.twiml.VoiceResponse();
 
-  var url =
-    "https://api.twilio.com/2010-04-01/Accounts/" +
-    event.AccountSid +
-    "/Recordings/" +
-    event.RecordingSid +
-    "/Transcriptions.json";
+  let url = 'https://api.twilio.com/2010-04-01/Accounts/' + event.AccountSid + '/Recordings/' + event.RecordingSid + '/Transcriptions.json';
 
   got
     .get(url, {
       headers: {
-        Authorization:
-          "Basic " +
-          Buffer.from(context.ACCOUNT_SID + ":" + context.AUTH_TOKEN).toString(
-            "base64"
-          ),
+        Authorization: 'Basic ' + Buffer.from(context.ACCOUNT_SID + ':' + context.AUTH_TOKEN).toString('base64'),
       },
     })
     .then(function (response) {
-      var json = response.body;
+      let json = response.body;
       json = JSON.parse(response.body);
-      console.log("Transcrition status: " + json.transcriptions[0].status);
+      console.log('Transcrition status: ' + json.transcriptions[0].status);
 
-      if (json.transcriptions[0].status === "completed") {
-        var xm_url = settings.xmatters + settings.xmattersHTTP;
+      if (json.transcriptions[0].status === 'completed') {
+        let xm_url = settings.xmatters + settings.xmattersHTTP;
         twiml.say({ voice: settings.voice }, context.Record_Success_Phrase);
 
         // Add last parameters to event
@@ -39,28 +30,28 @@ exports.handler = function (context, event, callback) {
           .post(xm_url, {
             body: JSON.stringify(event),
             headers: {
-              accept: "application/json",
+              accept: 'application/json',
             },
             json: true,
           })
           .then(function (response) {
-            var json = response.body;
-            console.log("xmatters event " + JSON.stringify(json));
+            let json = response.body;
+            console.log('xmatters event ' + JSON.stringify(json));
 
-            if (event.what === "Conference" && settings.transfer_to_bridge) {
-              console.log("xmatters create Conference");
+            if (event.what === 'Conference' && settings.transfer_to_bridge) {
+              console.log('xmatters create Conference');
               twiml.redirect(
-                "https://" +
+                'https://' +
                   context.DOMAIN_NAME +
                   settings.xm_bridgeforward +
-                  "?setting=" +
+                  '?setting=' +
                   encodeURI(JSON.stringify(settings)) +
-                  "&requestId=" +
+                  '&requestId=' +
                   json.requestId
               );
               callback(null, twiml);
             } else {
-              console.log("xmatters create Alert");
+              console.log('xmatters create Alert');
               twiml.say({ voice: settings.voice }, context.xMatters_Phrase);
               callback(null, twiml);
             }
@@ -71,36 +62,35 @@ exports.handler = function (context, event, callback) {
 
             callback(error);
           });
-      } else if (json.transcriptions[0].status === "in-progress") {
+      } else if (json.transcriptions[0].status === 'in-progress') {
         if (event.wait === undefined) {
           event.wait = 0;
         }
 
-        if (settings.waitPhrasetype === "joke") {
+        if (settings.waitPhrasetype === 'joke') {
           got
             .get(settings.jokeUrl, {
               headers: {
-                Accept: "application/json",
-                "User-Agent":
-                  "xMatters Phone API (https://github.com/xmatters/xm-labs-xMatters-By-Phone)",
+                Accept: 'application/json',
+                'User-Agent': 'xMatters Phone API (https://github.com/xmatters/xm-labs-xMatters-By-Phone)',
               },
             })
             .then(function (response) {
-              var jokeJson = JSON.parse(response.body);
+              let jokeJson = JSON.parse(response.body);
               if (event.wait === 0) {
-                var jokePreable = "... How about a joke while we wait.... ";
+                var jokePreable = '... How about a joke while we wait.... ';
               } else {
-                var jokePreable = "...";
+                var jokePreable = '...';
               }
-              event.waitPhrase = jokePreable + jokeJson.joke + "... ";
+              event.waitPhrase = jokePreable + jokeJson.joke + '... ';
               redirectFunction(settings, event);
             })
             .catch(function (error) {
-              console.log("Joke error " + error);
-              event.waitPhrase = "This may take a while, please be patient.";
+              console.log('Joke error ' + error);
+              event.waitPhrase = 'This may take a while, please be patient.';
               redirectFunction(settings, event);
             });
-        } else if (settings.waitPhrasetype === "phrase") {
+        } else if (settings.waitPhrasetype === 'phrase') {
           if (parseInt(settings.waitPhrasetype.length) <= event.wait) {
             event.waitPhrase = settings.waitPhrase[event.wait];
           } else {
@@ -114,27 +104,24 @@ exports.handler = function (context, event, callback) {
           event.waitPhrase = settings.waitPhraseStatic;
           redirectFunction(settings, event);
         }
-      } else if (json.transcriptions[0].status === "failed") {
-        twiml.say(
-          { voice: settings.voice, loop: 1 },
-          context.Transcribe_Fail_Phrase
-        );
+      } else if (json.transcriptions[0].status === 'failed') {
+        twiml.say({ voice: settings.voice, loop: 1 }, context.Transcribe_Fail_Phrase);
         twiml.redirect(
-          "https://" +
+          'https://' +
             context.DOMAIN_NAME +
             settings.xm_confirmRec +
-            "?setting=" +
+            '?setting=' +
             encodeURI(JSON.stringify(settings)) +
-            "&what=" +
+            '&what=' +
             event.what +
-            "&severity=" +
+            '&severity=' +
             event.severity +
-            "&recipient=" +
+            '&recipient=' +
             encodeURI(event.recipient) +
-            "&Message_Phrase=" +
+            '&Message_Phrase=' +
             encodeURI(event.Message_Phrase) +
-            "&Digits=" +
-            "00"
+            '&Digits=' +
+            '00'
         );
 
         callback(null, twiml);
@@ -142,7 +129,7 @@ exports.handler = function (context, event, callback) {
     })
     .catch(function (error) {
       // Handle error
-      console.log("errors: " + error);
+      console.log('errors: ' + error);
     });
 
   function redirectFunction(settings, event) {
@@ -150,30 +137,30 @@ exports.handler = function (context, event, callback) {
     twiml.pause({ length: 5 });
 
     twiml.redirect(
-      "https://" +
+      'https://' +
         context.DOMAIN_NAME +
         settings.xm_message +
-        "?setting=" +
+        '?setting=' +
         encodeURI(JSON.stringify(settings)) +
-        "&what=" +
+        '&what=' +
         event.what +
-        "&severity=" +
+        '&severity=' +
         event.severity +
-        "&recipient=" +
+        '&recipient=' +
         encodeURI(event.recipient) +
-        "&RecordingUrl=" +
+        '&RecordingUrl=' +
         event.RecordingUrl +
-        "&shorturl=" +
+        '&shorturl=' +
         event.shorturl +
-        "&Message_Phrase=" +
+        '&Message_Phrase=' +
         encodeURI(event.Message_Phrase) +
-        "&RecordingSid=" +
+        '&RecordingSid=' +
         event.RecordingSid +
-        "&transtatus=" +
+        '&transtatus=' +
         event.transtatus +
-        "&tranduration=" +
+        '&tranduration=' +
         event.tranduration +
-        "&wait=" +
+        '&wait=' +
         parseInt(event.wait + 1)
     );
 

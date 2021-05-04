@@ -55,6 +55,13 @@ exports.handler = function (context, event, callback) {
   // Do not include trailing slash
   setting.xmatters = 'https://company.cs1.xmatters.com';
 
+  // Number of escalation levels
+  // This option allows you to control the number of levels of on-call you would like to call.
+  // This helps if you have multiple people in a group but dont want to call everyone.
+  // Example: xMatters groups with 5 people on call and you only want to call the primary, secondard and tertiary
+  // Seting this option to 3 will stop calls from going to 4th and 5th levels.
+  setting.escLevels = '3';
+
   // xMatters Webservice username and password
   // https://help.xmatters.com/ondemand/user/apikeys.htm
   setting.xm_user = 'x-api-key-d061a0ae';

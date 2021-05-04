@@ -32,6 +32,7 @@ _Version 2 of the integration has many new features and quality of life enhancem
 - xm_escalate.js function re-written
 - xMatters install workflow added to automate parts of Twilio service creation
 - Fixed an install script bug causing undefined for all Twilio functions.
+- Added a new setting (escLevels) to limit the number/level of escalations that the system will call.
 
 <kbd>
   <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
@@ -605,6 +606,13 @@ setting.callerID = '15555555555';
 // xMatters Base URL
 // Do not include trailing slash
 setting.xmatters = 'https://company.cs1.xmatters.com';
+
+// Number of escalation levels
+// This option allows you to control the number of levels of on-call you would like to call.
+// This helps if you have multiple people in a group but dont want to call everyone.
+// Example: xMatters groups with 5 people on call and you only want to call the primary, secondard and tertiary
+// Seting this option to 3 will stop calls from going to 4th and 5th levels.
+setting.escLevels = '3';
 
 // xMatters Webservice username and password
 // https://help.xmatters.com/ondemand/user/apikeys.htm

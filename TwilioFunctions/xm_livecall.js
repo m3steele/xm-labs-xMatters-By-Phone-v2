@@ -1,21 +1,18 @@
-var got = require("got");
+let got = require('got');
 exports.handler = function (context, event, callback) {
-  console.log("LIVECALL");
-  var settings = JSON.parse(decodeURI(event.setting));
+  console.log('LIVECALL');
+  let settings = JSON.parse(decodeURI(event.setting));
   let twiml = new Twilio.twiml.VoiceResponse();
 
-  if (
-    parseInt(event.Digits) <= parseInt(settings.NumberofGroups) &&
-    parseInt(event.Digits) !== 0
-  ) {
+  if (parseInt(event.Digits) <= parseInt(settings.NumberofGroups) && parseInt(event.Digits) !== 0) {
     if (event.groupIndex === undefined) {
       // Adds a Recipient element to the Event Object which will be passed to xMatters to target the group.
       // the element in xMatters_Groups is one less than the digit recieved from user input.
-      var index = parseInt(event.Digits) - 1;
+      let index = parseInt(event.Digits) - 1;
       event.recipient = settings.xMatters_Groups[index];
     } else {
-      var targets = JSON.parse(decodeURI(event.targets));
-      var groupIndex = parseInt(event.groupIndex);
+      let targets = JSON.parse(decodeURI(event.targets));
+      let groupIndex = parseInt(event.groupIndex);
 
       event.recipient = targets[groupIndex].targetName;
       // Remove the group we are working on now so we can insert membership in its place
@@ -25,33 +22,25 @@ exports.handler = function (context, event, callback) {
     //***************************************
     //Get Whos-On-call
     //***************************************
-    var currenttime = new Date();
-    console.log("Getting Group On Call " + event.recipient);
+    let currenttime = new Date();
+    console.log('Getting Group On Call ' + event.recipient);
     return got(
       settings.xmatters +
-        "/api/xm/1/on-call?groups=" +
+        '/api/xm/1/on-call?groups=' +
         encodeURIComponent(event.recipient) +
-        "&membersPerShift=100" +
-        "&at=" +
+        '&membersPerShift=100' +
+        '&at=' +
         currenttime.toISOString(),
       {
         headers: {
-          accept: "application/json",
-          Authorization:
-            "Basic " +
-            Buffer.from(settings.xm_user + ":" + settings.xm_pass).toString(
-              "base64"
-            ),
+          accept: 'application/json',
+          Authorization: 'Basic ' + Buffer.from(settings.xm_user + ':' + settings.xm_pass).toString('base64'),
         },
         json: true,
       }
     )
       .then(function (response) {
-        console.log(
-          "Get Group " +
-            JSON.stringify(response.statusCode) +
-            JSON.stringify(response.body)
-        );
+        console.log('Get Group ' + JSON.stringify(response.statusCode) + JSON.stringify(response.body));
         response = response.body;
 
         // If groupIndex is undefined this must be the first time looking for groups
@@ -63,12 +52,12 @@ exports.handler = function (context, event, callback) {
           var oncallTarget = targets;
         }
 
-        console.log("oncallTarget " + JSON.stringify(oncallTarget));
+        console.log('oncallTarget ' + JSON.stringify(oncallTarget));
 
-        var oncall_array = [];
+        let oncall_array = [];
         // Check if there are any members in the group. If there are not record no primary on call and continue.
-        if (response["data"][0]["members"] === undefined) {
-          console.log("No Members");
+        if (response['data'][0]['members'] === undefined) {
+          console.log('No Members');
           // Group with no member, remove from oncallTargets
           oncallTarget.splice(groupIndex, 1);
           oncall_array.push(oncallTarget);
@@ -77,82 +66,41 @@ exports.handler = function (context, event, callback) {
 
         // Get each member thats on call
 
-        var targetArray = [];
+        let targetArray = [];
 
-        for (var m in response["data"][0]["members"]["data"]) {
+        for (let m in response['data'][0]['members']['data']) {
           console.log(
-            "Fetch the Group Members: " +
-              response["data"][0]["members"]["data"][m]["member"][
-                "targetName"
-              ] +
-              " " +
-              response["data"][0]["members"]["data"][m]["member"]["status"] +
-              " " +
-              response["data"][0]["members"]["data"][m]["member"][
-                "recipientType"
-              ]
+            'Fetch the Group Members: ' +
+              response['data'][0]['members']['data'][m]['member']['targetName'] +
+              ' ' +
+              response['data'][0]['members']['data'][m]['member']['status'] +
+              ' ' +
+              response['data'][0]['members']['data'][m]['member']['recipientType']
           );
 
           // Check if ACTIVE
-          if (
-            response["data"][0]["members"]["data"][m]["member"]["status"] ===
-            "ACTIVE"
-          ) {
+          if (response['data'][0]['members']['data'][m]['member']['status'] === 'ACTIVE') {
             // Check if recipientType = PERSON
-            if (
-              response["data"][0]["members"]["data"][m]["member"][
-                "recipientType"
-              ] === "PERSON"
-            ) {
+            if (response['data'][0]['members']['data'][m]['member']['recipientType'] === 'PERSON') {
               //Check for replacement
-              if (
-                response["data"][0]["members"]["data"][m]["absences"] !==
-                undefined
-              ) {
-                for (var a in response["data"][0]["members"]["data"][m][
-                  "absences"
-                ]["data"]) {
-                  if (
-                    response["data"][0]["members"]["data"][m]["absences"][
-                      "data"
-                    ][a]["absenceType"] !== "VACANCY"
-                  ) {
-                    console.log("HAS Absence, GET REPLACEMENT");
+              if (response['data'][0]['members']['data'][m]['absences'] !== undefined) {
+                for (let a in response['data'][0]['members']['data'][m]['absences']['data']) {
+                  if (response['data'][0]['members']['data'][m]['absences']['data'][a]['absenceType'] !== 'VACANCY') {
+                    console.log('HAS Absence, GET REPLACEMENT');
                     // Compare current time in UTC to response['data'][0]['members']['data'][0]['absences']['data'][a]['start'] and response['data'][0]['members']['data'][0]['absences']['data'][a]['end']
                     if (
-                      currenttime >=
-                        new Date(
-                          response["data"][0]["members"]["data"][m]["absences"][
-                            "data"
-                          ][a]["start"]
-                        ) &&
-                      currenttime <=
-                        new Date(
-                          response["data"][0]["members"]["data"][m]["absences"][
-                            "data"
-                          ][a]["end"]
-                        )
+                      currenttime >= new Date(response['data'][0]['members']['data'][m]['absences']['data'][a]['start']) &&
+                      currenttime <= new Date(response['data'][0]['members']['data'][m]['absences']['data'][a]['end'])
                     ) {
-                      var newTarget = {};
-                      newTarget.type =
-                        response["data"][0]["members"]["data"][m]["member"][
-                          "recipientType"
-                        ];
-                      newTarget.position =
-                        response["data"][0]["members"]["data"][m]["position"];
+                      let newTarget = {};
+                      newTarget.type = response['data'][0]['members']['data'][m]['member']['recipientType'];
+                      newTarget.position = response['data'][0]['members']['data'][m]['position'];
                       newTarget.fullName =
-                        response["data"][0]["members"]["data"][m]["absences"][
-                          "data"
-                        ][a]["replacement"]["firstName"] +
-                        " " +
-                        response["data"][0]["members"]["data"][m]["absences"][
-                          "data"
-                        ][a]["replacement"]["lastName"];
-                      newTarget.targetName =
-                        response["data"][0]["members"]["data"][m]["absences"][
-                          "data"
-                        ][a]["replacement"]["targetName"];
-                      newTarget.voice = "";
+                        response['data'][0]['members']['data'][m]['absences']['data'][a]['replacement']['firstName'] +
+                        ' ' +
+                        response['data'][0]['members']['data'][m]['absences']['data'][a]['replacement']['lastName'];
+                      newTarget.targetName = response['data'][0]['members']['data'][m]['absences']['data'][a]['replacement']['targetName'];
+                      newTarget.voice = '';
 
                       if (event.groupIndex === undefined) {
                         oncallTarget.push(newTarget);
@@ -164,27 +112,16 @@ exports.handler = function (context, event, callback) {
                   } // Close VACANCY check
                 }
               } else {
-                console.log("No Absence, set member to oncall list");
-                var newTarget = {};
-                newTarget.type =
-                  response["data"][0]["members"]["data"][m]["member"][
-                    "recipientType"
-                  ];
-                newTarget.position =
-                  response["data"][0]["members"]["data"][m]["position"];
+                console.log('No Absence, set member to oncall list');
+                let newTarget = {};
+                newTarget.type = response['data'][0]['members']['data'][m]['member']['recipientType'];
+                newTarget.position = response['data'][0]['members']['data'][m]['position'];
                 newTarget.fullName =
-                  response["data"][0]["members"]["data"][m]["member"][
-                    "firstName"
-                  ] +
-                  " " +
-                  response["data"][0]["members"]["data"][m]["member"][
-                    "lastName"
-                  ];
-                newTarget.targetName =
-                  response["data"][0]["members"]["data"][m]["member"][
-                    "targetName"
-                  ];
-                newTarget.voice = "";
+                  response['data'][0]['members']['data'][m]['member']['firstName'] +
+                  ' ' +
+                  response['data'][0]['members']['data'][m]['member']['lastName'];
+                newTarget.targetName = response['data'][0]['members']['data'][m]['member']['targetName'];
+                newTarget.voice = '';
 
                 if (event.groupIndex === undefined) {
                   oncallTarget.push(newTarget);
@@ -194,39 +131,17 @@ exports.handler = function (context, event, callback) {
                 }
               } // Close else and Absence check
             } // Close is PERSON
-            else if (
-              response["data"][0]["members"]["data"][m]["member"][
-                "recipientType"
-              ] === "DEVICE"
-            ) {
-              if (
-                response["data"][0]["members"]["data"][m]["member"][
-                  "deviceType"
-                ] === "VOICE"
-              ) {
-                var newTarget = {};
-                newTarget.type =
-                  response["data"][0]["members"]["data"][m]["member"][
-                    "recipientType"
-                  ];
-                newTarget.position =
-                  response["data"][0]["members"]["data"][m]["position"];
+            else if (response['data'][0]['members']['data'][m]['member']['recipientType'] === 'DEVICE') {
+              if (response['data'][0]['members']['data'][m]['member']['deviceType'] === 'VOICE') {
+                let newTarget = {};
+                newTarget.type = response['data'][0]['members']['data'][m]['member']['recipientType'];
+                newTarget.position = response['data'][0]['members']['data'][m]['position'];
                 newTarget.fullName =
-                  response["data"][0]["members"]["data"][m]["member"]["owner"][
-                    "firstName"
-                  ] +
-                  " " +
-                  response["data"][0]["members"]["data"][m]["member"]["owner"][
-                    "lastName"
-                  ];
-                newTarget.targetName =
-                  response["data"][0]["members"]["data"][m]["member"]["owner"][
-                    "targetName"
-                  ];
-                newTarget.voice =
-                  response["data"][0]["members"]["data"][m]["member"][
-                    "phoneNumber"
-                  ];
+                  response['data'][0]['members']['data'][m]['member']['owner']['firstName'] +
+                  ' ' +
+                  response['data'][0]['members']['data'][m]['member']['owner']['lastName'];
+                newTarget.targetName = response['data'][0]['members']['data'][m]['member']['owner']['targetName'];
+                newTarget.voice = response['data'][0]['members']['data'][m]['member']['phoneNumber'];
 
                 if (event.groupIndex === undefined) {
                   oncallTarget.push(newTarget);
@@ -235,26 +150,15 @@ exports.handler = function (context, event, callback) {
                   groupIndex = groupIndex + 1;
                 }
               }
-            } else if (
-              response["data"][0]["members"]["data"][m]["member"][
-                "recipientType"
-              ] === "GROUP"
-            ) {
-              console.log("Nested groups");
+            } else if (response['data'][0]['members']['data'][m]['member']['recipientType'] === 'GROUP') {
+              console.log('Nested groups');
 
-              var newTarget = {};
-              newTarget.type =
-                response["data"][0]["members"]["data"][m]["member"][
-                  "recipientType"
-                ];
-              newTarget.position =
-                response["data"][0]["members"]["data"][m]["position"];
-              newTarget.fullName = "";
-              newTarget.targetName =
-                response["data"][0]["members"]["data"][m]["member"][
-                  "targetName"
-                ];
-              newTarget.voice = "";
+              let newTarget = {};
+              newTarget.type = response['data'][0]['members']['data'][m]['member']['recipientType'];
+              newTarget.position = response['data'][0]['members']['data'][m]['position'];
+              newTarget.fullName = '';
+              newTarget.targetName = response['data'][0]['members']['data'][m]['member']['targetName'];
+              newTarget.voice = '';
 
               if (event.groupIndex === undefined) {
                 oncallTarget.push(newTarget);
@@ -271,61 +175,58 @@ exports.handler = function (context, event, callback) {
         return oncallTarget;
       })
       .then(function (response) {
-        var targets = response;
-        console.log("Updated targets " + JSON.stringify(targets));
+        let targets = response;
+        console.log('Updated targets ' + JSON.stringify(targets));
 
-        for (var gi in targets) {
-          if (targets[gi].type === "GROUP") {
-            console.log("Group Found at " + gi + " " + targets[gi].targetName);
+        for (let gi in targets) {
+          if (targets[gi].type === 'GROUP') {
+            console.log('Group Found at ' + gi + ' ' + targets[gi].targetName);
             twiml.redirect(
-              "https://" +
+              'https://' +
                 context.DOMAIN_NAME +
                 settings.xm_livecall +
-                "?setting=" +
+                '?setting=' +
                 encodeURI(JSON.stringify(settings)) +
-                "&targets=" +
+                '&targets=' +
                 encodeURI(JSON.stringify(targets)) +
-                "&Message_Phrase=" +
+                '&Message_Phrase=' +
                 encodeURI(event.Message_Phrase) +
-                "&groupIndex=" +
+                '&groupIndex=' +
                 gi +
-                "&Digits=" +
+                '&Digits=' +
                 event.Digits
             );
             callback(null, twiml);
-            return "group";
+            return 'group';
           }
         }
-        console.log("No groups found, start getting devices.");
+        console.log('No groups found, start getting devices.');
         return targets;
       })
       .then(function (response) {
-        console.log("after group check : " + JSON.stringify(response));
+        console.log('after group check : ' + JSON.stringify(response));
 
-        if (response !== "group") {
+        if (response !== 'group') {
           const promises = [];
 
-          var targets = response;
+          let targets = response;
 
           // Get user devices from xMatters and add to oncall list
-          for (var p in targets) {
-            console.log(
-              "Getting Voice Device for : " +
-                JSON.stringify(targets[p].targetName)
-            );
+          for (let p in targets) {
+            console.log('Getting Voice Device for : ' + JSON.stringify(targets[p].targetName));
             promises.push(getVoice(p, targets));
           }
 
           Promise.all(promises)
             .then(function (results) {
-              console.log("FINAL RESULT " + JSON.stringify(results));
+              console.log('FINAL RESULT ' + JSON.stringify(results));
               results = results[0];
 
               // Clean up target members and remove anyone who does not have a voice device
               if (results !== undefined) {
                 // Loop backwords to prevent re-indexing issues with splice
-                for (var blank = results.length - 1; blank >= 0; blank--) {
-                  if (results[blank].voice === "") {
+                for (let blank = results.length - 1; blank >= 0; blank--) {
+                  if (results[blank].voice === '') {
                     results.splice(blank, 1);
                   }
                 }
@@ -333,71 +234,60 @@ exports.handler = function (context, event, callback) {
 
               // No primary on call members
               if (results === undefined || results.length < 1) {
-                console.log("No primary oncall members");
+                console.log('No primary oncall members');
                 twiml.say(
                   {
                     voice: settings.voice,
                   },
-                  "Sorry, there is no one with a voice device on call right now. Try again later or target a different group."
+                  'Sorry, there is no one with a voice device on call right now. Try again later or target a different group.'
                 );
-                twiml.redirect(
-                  "https://" +
-                    context.DOMAIN_NAME +
-                    settings.xm_action +
-                    "?setting=" +
-                    encodeURI(JSON.stringify(settings))
-                );
+                twiml.redirect('https://' + context.DOMAIN_NAME + settings.xm_action + '?setting=' + encodeURI(JSON.stringify(settings)));
                 callback(null, twiml);
               }
               // Call the Primary on call
-              else if (results.length > 0 && results[0].type === "PERSON") {
-                console.log("Has Primary oncall members");
-               
-                var index = parseInt(event.Digits) - 1;
-                var recipientGroup = settings.Speak_Groups[index];
+              else if (results.length > 0 && results[0].type === 'PERSON') {
+                console.log('Has Primary oncall members');
+
+                let index = parseInt(event.Digits) - 1;
+                let recipientGroup = settings.Speak_Groups[index];
                 settings.recipientGroup = settings.Speak_Groups[index];
-                
+
                 // Tell user who we are about to call
                 twiml.say(
                   {
                     voice: settings.voice,
                   },
-                  "Sure, Please stand by while I connect you to the " +
-                      recipientGroup + " group, primary on call " +
+                  'Sure, Please stand by while I connect you to the ' +
+                    recipientGroup +
+                    ' group, primary on call ' +
                     results[0].fullName +
-                    "..., good luck with your problem!"
+                    '..., good luck with your problem!'
                 );
-                
+
                 // Redirect to API Create Call script
                 twiml.redirect(
-                  "https://" +
+                  'https://' +
                     context.DOMAIN_NAME +
                     settings.xm_escalate +
-                    "?setting=" +
+                    '?setting=' +
                     encodeURI(JSON.stringify(settings)) +
-                    "&targets=" +
+                    '&targets=' +
                     encodeURI(JSON.stringify(results)) +
-                    "&escalation=0"
+                    '&escalation=0'
                 );
 
                 callback(null, twiml);
               }
             })
             .catch(function (e) {
-              console.log("error", e);
+              console.log('error', e);
               twiml.say(
                 {
                   voice: settings.voice,
                 },
                 context.Livecall_Fail_Phrase
               );
-              twiml.redirect(
-                "https://" +
-                  context.DOMAIN_NAME +
-                  settings.xm_action +
-                  "?setting=" +
-                  encodeURI(JSON.stringify(settings))
-              );
+              twiml.redirect('https://' + context.DOMAIN_NAME + settings.xm_action + '?setting=' + encodeURI(JSON.stringify(settings)));
               callback(null, twiml);
             });
         } // Close Group check
@@ -405,8 +295,8 @@ exports.handler = function (context, event, callback) {
         function getVoice(p, targets) {
           const promise = new Promise((resolve, reject) => {
             return get_xm_devices(p, targets)
-              .then((value) => resolve(value))
-              .catch((error) => reject(error));
+              .then(value => resolve(value))
+              .catch(error => reject(error));
           });
           return promise;
         }
@@ -414,82 +304,58 @@ exports.handler = function (context, event, callback) {
 
         // Get target users Voice Device
         function get_xm_devices(p, targets) {
-          return got(
-            settings.xmatters +
-              "/api/xm/1/people/" +
-              targets[p].targetName +
-              "/devices",
-            {
-              headers: {conn
-                accept: "application/json",
-                Authorization:
-                  "Basic " +
-                  Buffer.from(
-                    settings.xm_user + ":" + settings.xm_pass
-                  ).toString("base64"),
-              },
-              json: true,
-            }
-          )
+          return got(settings.xmatters + '/api/xm/1/people/' + targets[p].targetName + '/devices', {
+            headers: {
+              accept: 'application/json',
+              Authorization: 'Basic ' + Buffer.from(settings.xm_user + ':' + settings.xm_pass).toString('base64'),
+            },
+            json: true,
+          })
             .then(function (response) {
               response = response.body;
-              console.log("Get Device Response " + JSON.stringify(response));
+              console.log('Get Device Response ' + JSON.stringify(response));
 
-              for (var t in response.data) {
-                if (response.data[t].deviceType === "VOICE") {
+              for (let t in response.data) {
+                if (response.data[t].deviceType === 'VOICE') {
                   targets[p].voice = response.data[t].phoneNumber;
                 }
               }
 
-              console.log(
-                "Targets with Voice Devices added: " + JSON.stringify(targets)
-              );
+              console.log('Targets with Voice Devices added: ' + JSON.stringify(targets));
               return targets;
             })
             .catch(function (error) {
-              console.log("error " + error);
+              console.log('error ' + error);
               twiml.say(
                 {
                   voice: settings.voice,
                 },
                 context.Livecall_Fail_Phrase
               );
-              twiml.redirect(
-                "https://" +
-                  context.DOMAIN_NAME +
-                  settings.xm_action +
-                  "?setting=" +
-                  encodeURI(JSON.stringify(settings))
-              );
+              twiml.redirect('https://' + context.DOMAIN_NAME + settings.xm_action + '?setting=' + encodeURI(JSON.stringify(settings)));
               callback(null, twiml);
             });
         } // Close function
         //=============
       })
       .catch(function (error) {
-        console.log("error " + error);
+        console.log('error ' + error);
         twiml.say(
           {
             voice: settings.voice,
           },
           context.Livecall_Fail_Phrase
         );
-        twiml.redirect(
-          "https://" +
-            context.DOMAIN_NAME +
-            settings.xm_action +
-            "?setting=" +
-            encodeURI(JSON.stringify(settings))
-        );
+        twiml.redirect('https://' + context.DOMAIN_NAME + settings.xm_action + '?setting=' + encodeURI(JSON.stringify(settings)));
         callback(null, twiml);
       });
   }
   // If group selection incorrect repeat the step
   else {
     // * redirects to begining
-    if (event.Digits === "*") {
+    if (event.Digits === '*') {
       twiml.say({ voice: settings.voice, loop: 1 }, context.Restart_Phrase);
-      twiml.redirect("https://" + context.DOMAIN_NAME + settings.xm_settings);
+      twiml.redirect('https://' + context.DOMAIN_NAME + settings.xm_settings);
       callback(null, twiml);
     }
 
@@ -497,38 +363,35 @@ exports.handler = function (context, event, callback) {
       twiml.say({ voice: settings.voice, loop: 1 }, context.Invalid_Phrase);
 
       const gather = twiml.gather({
-        input: "dtmf",
+        input: 'dtmf',
         numDigits: 1,
         timeout: 10,
         action:
-          "https://" +
+          'https://' +
           context.DOMAIN_NAME +
           settings.xm_livecall +
-          "?setting=" +
+          '?setting=' +
           encodeURI(JSON.stringify(settings)) +
-          "&Message_Phrase=" +
+          '&Message_Phrase=' +
           encodeURI(event.Message_Phrase) +
-          "&what=" +
+          '&what=' +
           event.what +
-          "&Digits=" +
+          '&Digits=' +
           event.Digits,
       });
-      gather.say(
-        { voice: settings.voice, loop: 1 },
-        event.Message_Phrase + settings.Group_Speak_Text
-      );
+      gather.say({ voice: settings.voice, loop: 1 }, event.Message_Phrase + settings.Group_Speak_Text);
 
       twiml.redirect(
-        "https://" +
+        'https://' +
           context.DOMAIN_NAME +
           settings.xm_livecall +
-          "?setting=" +
+          '?setting=' +
           encodeURI(JSON.stringify(settings)) +
-          "&Message_Phrase=" +
+          '&Message_Phrase=' +
           encodeURI(event.Message_Phrase) +
-          "&what=" +
+          '&what=' +
           event.what +
-          "&Digits=" +
+          '&Digits=' +
           event.Digits
       );
       callback(null, twiml);
