@@ -15,13 +15,13 @@ exports.handler = function (context, event, callback) {
   }
   // Make call to next on-call agent
   else {
-    // event.CallStatus === "in-progress" && !event.nodigits : First initiating call
+    // event.CallStatus === "in-progress" : First initiating call and some calls that go to voicemail
     // event.CallStatus === "completed" && event.nodigits === "true" : Calls that were answered but no digits press
     //  event.CallStatus === "no-answer"  || event.CallStatus === "busy" : Calls that are not answered and no digits or phone is busy
     if (
       targets.length > parseInt(event.escalation, 10) &&
       parseInt(event.escalation, 10) < settings.escLevels &&
-      ((event.CallStatus === 'in-progress' && !event.nodigits) ||
+      (event.CallStatus === 'in-progress' ||
         (event.CallStatus === 'completed' && event.nodigits === 'true') ||
         event.CallStatus === 'no-answer' ||
         event.CallStatus === 'busy')
