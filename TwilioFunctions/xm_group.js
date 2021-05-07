@@ -1,5 +1,7 @@
 exports.handler = function (context, event, callback) {
   console.log('GROUPS');
+  console.log('Incident severity=' + event.severity);
+
   let settings = JSON.parse(decodeURI(event.setting));
   let twiml = new Twilio.twiml.VoiceResponse();
 
@@ -44,6 +46,7 @@ exports.handler = function (context, event, callback) {
 
     //  Direct to livecall function
     if (what === 'Livecall') {
+      console.log('Live Calling');
       // only 1 group, redirect with no gather to xm_livecall and include digits=1
       if (settings.NumberofGroups === 1) {
         twiml.redirect(
@@ -100,6 +103,8 @@ exports.handler = function (context, event, callback) {
     // Redirect to xm_incident so user can set incident severity
     // This only runs first time through on this script
     else if (what === 'Incident-Initial') {
+      console.log('Incident-Initial');
+
       // No default value set
       if (settings.defaultSeverity === '') {
         const gather = twiml.gather({
@@ -155,6 +160,9 @@ exports.handler = function (context, event, callback) {
 
     // Gather Group and direct to record function
     else {
+      console.log('Not Live calling, we need to get a group to target');
+
+      // Check if we have severity
       var severityValue = '&severity=';
       severityValue += event.severity ? event.severity : 'none';
 
@@ -197,6 +205,14 @@ exports.handler = function (context, event, callback) {
       // repeats the message until a response is recieved
       gather.say({ voice: settings.voice, loop: 1 }, Message_Phrase + settings.Group_Speak_Text);
 
+      // Pass severity if this is an incident.
+      // Pass Digits if this is any other event type
+      if (what === 'Incident') {
+        var digorsev = severityValue;
+      } else {
+        var digorsev = '&Digits=' + event.Digits;
+      }
+
       twiml.redirect(
         'https://' +
           context.DOMAIN_NAME +
@@ -207,8 +223,7 @@ exports.handler = function (context, event, callback) {
           encodeURI(Message_Phrase) +
           '&what=' +
           what +
-          '&Digits=' +
-          event.Digits
+          digorsev
       );
       callback(null, twiml);
     }
@@ -216,12 +231,15 @@ exports.handler = function (context, event, callback) {
 
   // Incorrect Digits Repeat last step
   else {
+    console.log('Incorrect Digits');
     // * redirects to begining
     if (event.Digits === '*') {
       twiml.say({ voice: settings.voice, loop: 1 }, context.Restart_Phrase);
       twiml.redirect('https://' + context.DOMAIN_NAME + settings.xm_settings);
       callback(null, twiml);
     }
+
+    console.log('Invalid action, (not incident): replay action items');
 
     twiml.say({ voice: settings.voice, loop: 1 }, context.Invalid_Phrase);
     const gather = twiml.gather({
