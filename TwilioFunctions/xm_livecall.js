@@ -245,7 +245,7 @@ exports.handler = function (context, event, callback) {
                 callback(null, twiml);
               }
               // Call the Primary on call
-              else if (results.length > 0 && results[0].type === 'PERSON') {
+              else if ((results.length > 0 && results[0].type === 'PERSON') || (results[0].type === 'DEVICE' && results[0].hasOwnProperty('voice'))) {
                 console.log('Has Primary oncall members');
 
                 let index = parseInt(event.Digits) - 1;
