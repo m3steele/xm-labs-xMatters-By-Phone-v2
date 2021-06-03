@@ -34,8 +34,22 @@ _Version 2 of the integration has many new features and quality of life enhancem
 - Fixed an install script bug causing undefined for all Twilio functions.
 - Added a new setting (escLevels) to limit the number/level of escalations that the system will call.
 
+**June 3, 2021 Updates**
+
+- Added support for the initiating user hanging up before an on-call member answers the call but after the call has been placed. This new update will check if the initiating call is still connected and if it has been disconnected, a message will be played to the on-call member answering the phone letting them know the initiating user has already hung up. Previously, the on-call user would just hear dead air.
+- Various bug fixes
+- Added Process Map to documentation
+
 <kbd>
   <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
+</kbd>
+
+# Integration Process Map
+
+The below diagram will help describe how all the pieces of this integration work together.
+
+<kbd>
+  <img src="/media/xMatters-by-Phone-Process-Map.png">
 </kbd>
 
 # Pre-Requisites
@@ -409,7 +423,7 @@ After changing environment variables in Twilio you will need to Click
 | Record_Fail_Phrase     | Without failure, there is no achievement. Let's try again.                                                                                        |
 | Record_Success_Phrase  | You are a natural! I've sent this over to x matters.                                                                                              |
 | xMatters_Phrase        | Sit back and relax, x matters is taking care of business. Goodbye.                                                                                |
-| Emptyoncall_Phrase     | There is no one with a voice device on call right now. You might want to try another group or a different type of alert.                          |
+| Emptyoncall_Phrase     | Sorry, there is no one with a voice device on call right now. Try again later or target a different group.                                        |
 | Noanswer_Phrase        | It's all fun and games, then the Primary On call forgets to answer the phone... You might want to try another group or a different type of alert. |
 | Openbridge_Phrase      | xMatters is spinning up the conference bridge, I will connect you when it's ready.                                                                |
 | Livecall_Fail_Phrase   | Oops, something went wrong. Please try again.                                                                                                     |
