@@ -50,8 +50,9 @@ _Version 2 of the integration has many new features and quality of life enhancem
 The below diagram will help describe how all the pieces of this integration work together.
 [Process Map PDF](media/xMatters-by-Phone-Process-Map.pdf)
 
+Recommended that you open outside of GitHub for better resolution.
 <kbd>
-  <img src="/media/xMatters-by-Phone-Process-Map.svg">
+<img src="/media/xMatters-by-Phone-Process-Map.svg">
 </kbd>
 
 # Pre-Requisites
