@@ -37,6 +37,7 @@ _Version 2 of the integration has many new features and quality of life enhancem
 **June 3, 2021 Updates**
 
 - Added support for the initiating user hanging up before an on-call member answers the call but after the call has been placed. This new update will check if the initiating call is still connected and if it has been disconnected, a message will be played to the on-call member answering the phone letting them know the initiating user has already hung up. Previously, the on-call user would just hear dead air.
+- The integraiton now handles adding devices directly into a group. It's always recommended to add users to groups in xMatters but in the event you add a device the integration will not break.
 - Various bug fixes
 - Added Process Map to documentation
 
@@ -47,9 +48,10 @@ _Version 2 of the integration has many new features and quality of life enhancem
 # Integration Process Map
 
 The below diagram will help describe how all the pieces of this integration work together.
+[Process Map PDF](media/xMatters-by-Phone-Process-Map.pdf)
 
 <kbd>
-  <img src="/media/xMatters-by-Phone-Process-Map.png">
+  <img src="/media/xMatters-by-Phone-Process-Map.svg">
 </kbd>
 
 # Pre-Requisites
