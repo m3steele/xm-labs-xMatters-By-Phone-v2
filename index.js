@@ -47,7 +47,8 @@ app.post('/installfunctions', async function (req, res) {
     };
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
+        console.log(JSON.stringify(response.data.function_sid));
         build.append('FunctionVersions', response.data.function_sid);
 
         //{"sid":"ZN564e2183eb08a503b74feac84dcff88d","account_sid":"AC931b01e2978dfc791b5c99658c7301e8","service_sid":"ZS26f9a7b18385aa1c56a0a693964f4520","function_sid":"ZH77608acf092549b5846e2e01d542e61f","path":"/xm_bridgeforward","visibility":"public","date_created":"2021-09-01T22:56:41Z"}
@@ -59,18 +60,15 @@ app.post('/installfunctions', async function (req, res) {
 
   // Create Twilio Assets
   request.twilioAssetstoDeploy = request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, '');
-  console.log('ARE WE HERE');
+
   if (request.twilioAssetstoDeploy.split(',').length < 1) {
-    console.log('short');
     var assetNames = [];
     assetNames.push(request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, ''));
-    console.log('clean ' + JSON.stringify(assetNames));
   } else {
     var assetNames = request.twilioAssetstoDeploy
       .replace(' ', '')
       .replace(/(\r\n|\n|\r)/gm, '')
       .split(',');
-    console.log('clean ' + JSON.stringify(assetNames));
   }
 
   // Create new Twilio Asset Version
@@ -78,7 +76,7 @@ app.post('/installfunctions', async function (req, res) {
     var asset = new FormData();
 
     const assetPath = path.join(__dirname + '/TwilioFunctions/' + assetNames[ass].replace(' ', ''));
-    console.log('assetPath ' + assetPath);
+
     asset.append('Content', fs.createReadStream(assetPath));
     asset.append('Path', assetNames[ass]);
     asset.append('Visibility', 'public');
@@ -99,7 +97,8 @@ app.post('/installfunctions', async function (req, res) {
     };
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        //console.log(JSON.stringify(response.data));
+        console.log('ASSETID: ' + JSON.stringify(response.data.asset_sid));
         build.append('AssetVersions', response.data.asset_sid);
       })
       .catch(function (error) {
@@ -112,7 +111,7 @@ app.post('/installfunctions', async function (req, res) {
     'Dependencies',
     '[\n   {"name":"lodash","version":"4.17.11"},\n   {"name":"twilio","version":"3.29.2"},\n   {"name":"fs","version":"0.0.1-security"},\n   {"name":"got","version":"6.7.1"},\n   {"name":"xmldom","version":"0.1.27"},{"name":"@twilio/runtime-handler","version":"1.0.1"}\n]'
   );
-
+  console.log('MY BUILD:: ' + JSON.stringify(build));
   var config = {
     method: 'post',
     url: 'https://serverless.twilio.com/v1/Services/' + request.twilioServiceSid + '/Builds',
