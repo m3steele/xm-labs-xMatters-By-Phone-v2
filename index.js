@@ -64,8 +64,8 @@ app.post('/installfunctions', async function (req, res) {
   for (var ass in assetNames) {
     var asset = new FormData();
 
-    const functionPath = path.join(__dirname + '/TwilioFunctions/' + assetNames[ass].replace(' ', ''));
-    asset.append('Content', fs.createReadStream(functionPath));
+    const assetPath = path.join(__dirname + '/TwilioFunctions/' + assetNames[ass].replace(' ', ''));
+    asset.append('Content', fs.createReadStream(assetPath));
     asset.append('Path', assetNames[ass]);
     asset.append('Visibility', 'public');
 
