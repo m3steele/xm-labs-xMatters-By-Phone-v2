@@ -58,7 +58,11 @@ app.post('/installfunctions', async function (req, res) {
   } //  close for each Function
 
   // Create Twilio Assets
-  var assetNames = request.twilioAssetstoDeploy.replace(' ', '').split(',');
+  if (request.twilioAssetstoDeploy.count(',') < 1) {
+    var assetNames = [request.twilioAssetstoDeploy];
+  } else {
+    var assetNames = request.twilioAssetstoDeploy.replace(' ', '').replace('\n', '').split(',');
+  }
 
   // Create new Twilio Asset Version
   for (var ass in assetNames) {
