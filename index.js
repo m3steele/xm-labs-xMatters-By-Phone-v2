@@ -89,7 +89,7 @@ app.post('/installfunctions', async function (req, res) {
         'https://serverless-upload.twilio.com/v1/Services/' +
         request.twilioServiceSid +
         '/Assets/' +
-        request.twilioAssetsSids[assetNames[ass]] +
+        request.twilioAssetSids[assetNames[ass]] +
         '/Versions',
       headers: {
         Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
