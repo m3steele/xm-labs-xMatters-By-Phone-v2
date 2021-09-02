@@ -58,10 +58,19 @@ app.post('/installfunctions', async function (req, res) {
   } //  close for each Function
 
   // Create Twilio Assets
+  request.twilioAssetstoDeploy = request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, '');
+  console.log('ARE WE HERE');
   if (request.twilioAssetstoDeploy.split(',').length < 1) {
-    var assetNames = [request.twilioAssetstoDeploy];
+    console.log('short');
+    var assetNames = [];
+    assetNames.push(request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, ''));
+    console.log('clean ' + JSON.stringify(assetNames));
   } else {
-    var assetNames = request.twilioAssetstoDeploy.replace(' ', '').replace('\n', '').split(',');
+    var assetNames = request.twilioAssetstoDeploy
+      .replace(' ', '')
+      .replace(/(\r\n|\n|\r)/gm, '')
+      .split(',');
+    console.log('clean ' + JSON.stringify(assetNames));
   }
 
   // Create new Twilio Asset Version
@@ -69,6 +78,7 @@ app.post('/installfunctions', async function (req, res) {
     var asset = new FormData();
 
     const assetPath = path.join(__dirname + '/TwilioFunctions/' + assetNames[ass].replace(' ', ''));
+    console.log('assetPath ' + assetPath);
     asset.append('Content', fs.createReadStream(assetPath));
     asset.append('Path', assetNames[ass]);
     asset.append('Visibility', 'public');
