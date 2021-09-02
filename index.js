@@ -86,7 +86,6 @@ app.post('/installfunctions', async function (req, res) {
     axios(config)
       .then(function (response) {
         console.log(JSON.stringify(response.data));
-
         build.append('AssetVersions', response.data.asset_sid);
       })
       .catch(function (error) {
@@ -95,10 +94,7 @@ app.post('/installfunctions', async function (req, res) {
   } //  close for each asset
 
   // Create Build
-  var axios = require('axios');
-  var FormData = require('form-data');
-  var data = new FormData();
-  data.append(
+  build.append(
     'Dependencies',
     '[\n   {"name":"lodash","version":"4.17.11"},\n   {"name":"twilio","version":"3.29.2"},\n   {"name":"fs","version":"0.0.1-security"},\n   {"name":"got","version":"6.7.1"},\n   {"name":"xmldom","version":"0.1.27"},{"name":"@twilio/runtime-handler","version":"1.0.1"}\n]'
   );
@@ -108,9 +104,9 @@ app.post('/installfunctions', async function (req, res) {
     url: 'https://serverless.twilio.com/v1/Services/' + request.twilioServiceSid + '/Builds',
     headers: {
       Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
-      ...data.getHeaders(),
+      ...build.getHeaders(),
     },
-    data: data,
+    data: build,
   };
   axios(config)
     .then(function (response) {
