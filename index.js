@@ -25,6 +25,7 @@ app.post('/installfunctions', async function (req, res) {
   for (var fun in functionNames) {
     var data = new FormData();
     var build = new URLSearchParams();
+    var myBuild = {};
 
     const functionPath = path.join(__dirname + '/TwilioFunctions/' + functionNames[fun].replace(' ', '') + '.js');
     data.append('Content', fs.createReadStream(functionPath));
@@ -50,6 +51,7 @@ app.post('/installfunctions', async function (req, res) {
         // console.log(JSON.stringify(response.data));
         console.log(JSON.stringify(response.data.function_sid));
         build.append('FunctionVersions', response.data.function_sid);
+        myBuild.FunctionVersions = response.data.function_sid;
 
         //{"sid":"ZN564e2183eb08a503b74feac84dcff88d","account_sid":"AC931b01e2978dfc791b5c99658c7301e8","service_sid":"ZS26f9a7b18385aa1c56a0a693964f4520","function_sid":"ZH77608acf092549b5846e2e01d542e61f","path":"/xm_bridgeforward","visibility":"public","date_created":"2021-09-01T22:56:41Z"}
       })
@@ -100,6 +102,7 @@ app.post('/installfunctions', async function (req, res) {
         //console.log(JSON.stringify(response.data));
         console.log('ASSETID: ' + JSON.stringify(response.data.asset_sid));
         build.append('AssetVersions', response.data.asset_sid);
+        myBuild.AssetVersions = response.data.asset_sid;
       })
       .catch(function (error) {
         console.log(error);
@@ -111,7 +114,21 @@ app.post('/installfunctions', async function (req, res) {
     'Dependencies',
     '[\n   {"name":"lodash","version":"4.17.11"},\n   {"name":"twilio","version":"3.29.2"},\n   {"name":"fs","version":"0.0.1-security"},\n   {"name":"got","version":"6.7.1"},\n   {"name":"xmldom","version":"0.1.27"},{"name":"@twilio/runtime-handler","version":"1.0.1"}\n]'
   );
-  console.log('MY BUILD:: ' + JSON.stringify(build));
+  myBuild.Dependencies = [
+    { name: 'lodash', version: '4.17.11' },
+    { name: 'twilio', version: '3.29.2' },
+    { name: 'fs', version: '0.0.1-security' },
+    { name: 'got', version: '6.7.1' },
+    { name: 'xmldom', version: '0.1.27' },
+    { name: '@twilio/runtime-handler', version: '1.0.1' },
+  ];
+
+  console.log('BUILD:: ' + build);
+
+  console.log('MY BUILD:: ' + JSON.stringify(myBuild));
+
+  myBuild = JSON.stringify(myBuild);
+
   var config = {
     method: 'post',
     url: 'https://serverless.twilio.com/v1/Services/' + request.twilioServiceSid + '/Builds',
@@ -119,7 +136,7 @@ app.post('/installfunctions', async function (req, res) {
       Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    data: build,
+    data: myBuild,
   };
   axios(config)
     .then(function (response) {
