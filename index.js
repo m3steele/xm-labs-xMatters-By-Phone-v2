@@ -24,7 +24,7 @@ app.post('/installfunctions', async function (req, res) {
 
   for (var fun in functionNames) {
     var data = new FormData();
-    var build = new FormData();
+    var build = new URLSearchParams();
 
     const functionPath = path.join(__dirname + '/TwilioFunctions/' + functionNames[fun].replace(' ', '') + '.js');
     data.append('Content', fs.createReadStream(functionPath));
@@ -117,7 +117,7 @@ app.post('/installfunctions', async function (req, res) {
     url: 'https://serverless.twilio.com/v1/Services/' + request.twilioServiceSid + '/Builds',
     headers: {
       Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
-      ...build.getHeaders(),
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
     data: build,
   };
