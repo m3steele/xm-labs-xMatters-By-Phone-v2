@@ -46,7 +46,7 @@ app.post('/installfunctions', async function (req, res) {
       },
       data: data,
     };
-    axios(config)
+    await axios(config)
       .then(function (response) {
         // console.log(JSON.stringify(response.data));
         console.log(JSON.stringify(response.data.function_sid));
@@ -97,7 +97,7 @@ app.post('/installfunctions', async function (req, res) {
       },
       data: asset,
     };
-    axios(config)
+    await axios(config)
       .then(function (response) {
         //console.log(JSON.stringify(response.data));
         console.log('ASSETID: ' + JSON.stringify(response.data.asset_sid));
@@ -138,7 +138,7 @@ app.post('/installfunctions', async function (req, res) {
     },
     data: myBuild,
   };
-  axios(config)
+  await axios(config)
     .then(function (response) {
       console.log(JSON.stringify(response.data));
     })
