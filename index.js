@@ -120,8 +120,8 @@ app.post('/installfunctions', async function (req, res) {
   var buildDetails = await axios
     .post(url, build, config)
     .then(response => {
-      console.log(JSON.stringify('Buiulding - URL: ' + response.data.links.build_status));
-      return response.data.links.build_status;
+      console.log(JSON.stringify('Building - URL: ' + response.data.links.build_status));
+      return response.data;
     })
     .catch(err => {
       console.log(err);
@@ -142,7 +142,7 @@ app.post('/installfunctions', async function (req, res) {
     axios
       .get(url, config)
       .then(response => {
-        console.log('build status ' + JSON.stringify(response.data));
+        console.log('Build status ' + JSON.stringify(response.data));
 
         if (response.data.status === 'completed') {
           var deploy = new URLSearchParams();
