@@ -130,7 +130,7 @@ app.post('/installfunctions', async function (req, res) {
   //'https://serverless.twilio.com/v1/Services/ZSXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Builds/ZBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Status' \
   //'https://serverless.twilio.com/v1/Services/' +  request.twilioServiceSid '/Builds/' + + '/Status';
 
-  setInterval(function () {
+  setInterval(async function () {
     var url = buildDetails.links.build_status;
     var config = {
       headers: {
@@ -139,38 +139,13 @@ app.post('/installfunctions', async function (req, res) {
       },
     };
 
-    axios
+    await axios
       .get(url, config)
       .then(response => {
         console.log('Build status ' + JSON.stringify(response.data));
 
         if (response.data.status === 'completed') {
-          var deploy = new URLSearchParams();
-          var url =
-            'https://serverless.twilio.com/v1/Services/' +
-            request.twilioServiceSid +
-            '/Environments/' +
-            request.twilioEnvironmentSid +
-            '/Deployments';
-          deploy.append('BuildSid', buildDetails.sid);
-
-          var config = {
-            headers: {
-              Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          };
-
-          axios
-            .post(url, deploy, config)
-            .then(response => {
-              console.log(JSON.stringify('Deploy status: ' + response.data));
-              return;
-            })
-            .catch(err => {
-              console.log(err);
-            });
-          return;
+          return makeDeploy(request, buildDetails);
         }
       })
       .catch(err => {
@@ -178,6 +153,30 @@ app.post('/installfunctions', async function (req, res) {
       });
   }, 5000); //10000 milliseconds = 10 seconds
 });
+
+function makeDeploy(request, buildDetails) {
+  var deploy = new URLSearchParams();
+  var url =
+    'https://serverless.twilio.com/v1/Services/' + request.twilioServiceSid + '/Environments/' + request.twilioEnvironmentSid + '/Deployments';
+  deploy.append('BuildSid', buildDetails.sid);
+
+  var config = {
+    headers: {
+      Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  };
+
+  axios
+    .post(url, deploy, config)
+    .then(response => {
+      console.log('Deploy status: ' + JSON.stringify(response.data));
+      return;
+    })
+    .catch(err => {
+      console.log(err);
+    });
+}
 
 function getTwilFunctions() {
   //var functionNames = ['xm_settings', 'xm_action', 'xm_group', 'xm_record', 'xm_livecall', 'xm_escalate', 'xm_confirmRec', 'xm_shorten', 'xm_message'];
