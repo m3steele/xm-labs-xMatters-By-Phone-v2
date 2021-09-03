@@ -270,6 +270,7 @@ const createAssetFunction = async (request, type) => {
         console.log(error);
       });
   } //  close for each asset
+  return;
 };
 
 const createBuild = async request => {};
