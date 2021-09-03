@@ -28,8 +28,8 @@ app.post('/installfunctions', async function (req, res) {
 
   //var versions = await createVersions(request);
   //var assets = await createAssets(request);
-  await createAssetFunction(request, 'Asset');
-  await createAssetFunction(request, 'Function');
+  build = await createAssetFunction(request, 'Asset', build);
+  build = await createAssetFunction(request, 'Function', build);
 
   //  var newbuild = await createBuild(request);
   //  var deploy = await createDeploy(request);
@@ -219,7 +219,7 @@ const createAssets = async request => {
   } //  close for each asset
 };
 
-const createAssetFunction = async (request, type) => {
+const createAssetFunction = async (request, type, build) => {
   //Asset
   //Function
 
@@ -273,7 +273,7 @@ const createAssetFunction = async (request, type) => {
         console.log(error);
       });
   } //  close for each asset
-  return;
+  return build;
 };
 
 const createBuild = async request => {};
