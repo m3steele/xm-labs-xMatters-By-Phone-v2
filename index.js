@@ -239,9 +239,9 @@ const createAssetFunction = async (request, type) => {
   for (var x in names) {
     var data = new FormData();
 
-    const path = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
+    const url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
 
-    data.append('Content', fs.createReadStream(path));
+    data.append('Content', fs.createReadStream(url));
     data.append('Path', names[x]);
     data.append('Visibility', 'public');
 
