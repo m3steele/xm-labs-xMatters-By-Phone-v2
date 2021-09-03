@@ -239,9 +239,9 @@ const createAssetFunction = async (request, type) => {
   for (var x in names) {
     var data = new FormData();
     if (type === 'Function') {
-      const url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', '') + '.js');
+      var url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', '') + '.js');
     } else {
-      const url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
+      var url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
     }
 
     data.append('Content', fs.createReadStream(url));
