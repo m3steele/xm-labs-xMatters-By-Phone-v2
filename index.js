@@ -130,7 +130,7 @@ app.post('/installfunctions', async function (req, res) {
   //'https://serverless.twilio.com/v1/Services/ZSXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Builds/ZBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/Status' \
   //'https://serverless.twilio.com/v1/Services/' +  request.twilioServiceSid '/Builds/' + + '/Status';
 
-  setInterval(async function () {
+  const interval = setInterval(async function () {
     var url = buildDetails.links.build_status;
     var config = {
       headers: {
