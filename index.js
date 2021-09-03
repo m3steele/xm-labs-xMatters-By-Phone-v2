@@ -145,7 +145,8 @@ app.post('/installfunctions', async function (req, res) {
         console.log('Build status ' + JSON.stringify(response.data));
 
         if (response.data.status === 'completed') {
-          return makeDeploy(request, buildDetails);
+          makeDeploy(request, buildDetails);
+          clearInterval(interval);
         }
       })
       .catch(err => {
