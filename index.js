@@ -19,88 +19,20 @@ app.post('/installfunctions', async function (req, res) {
   console.log(JSON.stringify(req.body, null, 2));
   var request = req.body;
 
+  // Clean functions and assets to deploy data
+  request.twilioFunctionstoDeploy = request.twilioFunctionstoDeploy.replace(/(\r\n|\n|\r)/gm, '').replace(' ', '');
+  request.twilioAssetstoDeploy = request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, '').replace(' ', '');
+
   // Create new Twilio Function Version
   var build = new URLSearchParams();
-  var functionNames = request.twilioFunctionstoDeploy.replace(' ', '').split(',');
 
-  for (var fun in functionNames) {
-    var data = new FormData();
+  //var versions = await createVersions(request);
+  //var assets = await createAssets(request);
+  await createAssetFunction(request, 'Asset');
+  await createAssetFunction(request, 'Function');
 
-    const functionPath = path.join(__dirname + '/TwilioFunctions/' + functionNames[fun].replace(' ', '') + '.js');
-    data.append('Content', fs.createReadStream(functionPath));
-    data.append('Path', functionNames[fun]);
-    data.append('Visibility', 'public');
-
-    var config = {
-      method: 'post',
-      url:
-        'https://serverless-upload.twilio.com/v1/Services/' +
-        request.twilioServiceSid +
-        '/Functions/' +
-        request.twilioFunctionSids[functionNames[fun]] +
-        '/Versions',
-      headers: {
-        Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
-        ...data.getHeaders(),
-      },
-      data: data,
-    };
-    await axios(config)
-      .then(function (response) {
-        console.log('FUNCTION VERSION ID: ' + JSON.stringify(response.data.sid));
-        build.append('FunctionVersions', response.data.sid);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } //  close for each Function
-
-  // Create Twilio Assets
-  request.twilioAssetstoDeploy = request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, '');
-
-  if (request.twilioAssetstoDeploy.split(',').length < 1) {
-    var assetNames = [];
-    assetNames.push(request.twilioAssetstoDeploy.replace(/(\r\n|\n|\r)/gm, ''));
-  } else {
-    var assetNames = request.twilioAssetstoDeploy
-      .replace(' ', '')
-      .replace(/(\r\n|\n|\r)/gm, '')
-      .split(',');
-  }
-
-  // Create new Twilio Asset Version
-  for (var ass in assetNames) {
-    var asset = new FormData();
-
-    const assetPath = path.join(__dirname + '/TwilioFunctions/' + assetNames[ass].replace(' ', ''));
-
-    asset.append('Content', fs.createReadStream(assetPath));
-    asset.append('Path', assetNames[ass]);
-    asset.append('Visibility', 'public');
-
-    var config = {
-      method: 'post',
-      url:
-        'https://serverless-upload.twilio.com/v1/Services/' +
-        request.twilioServiceSid +
-        '/Assets/' +
-        request.twilioAssetSids[assetNames[ass]] +
-        '/Versions',
-      headers: {
-        Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
-        ...asset.getHeaders(),
-      },
-      data: asset,
-    };
-    await axios(config)
-      .then(function (response) {
-        console.log('ASSET VERSION ID: ' + JSON.stringify(response.data.sid));
-        build.append('AssetVersions', response.data.sid);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } //  close for each asset
+  //  var newbuild = await createBuild(request);
+  //  var deploy = await createDeploy(request);
 
   // Create Build
   build.append(
@@ -201,6 +133,148 @@ function getTwilFunctions() {
       });
   }
 }
+
+const createVersions = async request => {
+  if (request.twilioFunctionstoDeploy.split(',').length < 1) {
+    var functionNames = [];
+    functionNames.push(request.twilioFunctionstoDeploy);
+  } else {
+    var functionNames = request.twilioFunctionstoDeploy.split(',');
+  }
+
+  for (var fun in functionNames) {
+    var data = new FormData();
+
+    const functionPath = path.join(__dirname + '/TwilioFunctions/' + functionNames[fun].replace(' ', '') + '.js');
+
+    data.append('Content', fs.createReadStream(functionPath));
+    data.append('Path', functionNames[fun]);
+    data.append('Visibility', 'public');
+
+    var config = {
+      method: 'post',
+      url:
+        'https://serverless-upload.twilio.com/v1/Services/' +
+        request.twilioServiceSid +
+        '/Functions/' +
+        request.twilioFunctionSids[functionNames[fun]] +
+        '/Versions',
+      headers: {
+        Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
+        ...data.getHeaders(),
+      },
+      data: data,
+    };
+    await axios(config)
+      .then(function (response) {
+        console.log('FUNCTION VERSION ID: ' + JSON.stringify(response.data.sid));
+        build.append('FunctionVersions', response.data.sid);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } //  close for each Function
+};
+
+const createAssets = async request => {
+  if (request.twilioAssetstoDeploy.split(',').length < 1) {
+    var assetNames = [];
+    assetNames.push(request.twilioAssetstoDeploy);
+  } else {
+    var assetNames = request.twilioAssetstoDeploy.split(',');
+  }
+
+  // Create new Twilio Asset Version
+  for (var ass in assetNames) {
+    var data = new FormData();
+
+    const assetPath = path.join(__dirname + '/TwilioFunctions/' + assetNames[ass].replace(' ', ''));
+
+    data.append('Content', fs.createReadStream(assetPath));
+    data.append('Path', assetNames[ass]);
+    data.append('Visibility', 'public');
+
+    var config = {
+      method: 'post',
+      url:
+        'https://serverless-upload.twilio.com/v1/Services/' +
+        request.twilioServiceSid +
+        '/Assets/' +
+        request.twilioAssetSids[assetNames[ass]] +
+        '/Versions',
+      headers: {
+        Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
+        ...data.getHeaders(),
+      },
+      data: data,
+    };
+    await axios(config)
+      .then(function (response) {
+        console.log('ASSET VERSION ID: ' + JSON.stringify(response.data.sid));
+        build.append('AssetVersions', response.data.sid);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } //  close for each asset
+};
+
+const createAssetFunction = async (request, type) => {
+  //Asset
+  //Function
+
+  //Create path to twilioAssetstoDeploy or twilioFunctionstoDeploy in request
+  const twilioTypetoDeploy = 'twilio' + type + 'stoDeploy';
+  //Create path to twilioAssetSids or twilioFunctionSids in request
+  const twilioTypeSids = 'twilio' + type + 'Sids';
+
+  if (request[twilioTypetoDeploy].split(',').length < 1) {
+    var names = [];
+    names.push(request[twilioTypetoDeploy]);
+  } else {
+    var names = request[twilioTypetoDeploy].split(',');
+  }
+
+  // Create new Twilio Function or Asset Version
+  for (var x in version) {
+    var data = new FormData();
+
+    const path = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
+
+    data.append('Content', fs.createReadStream(path));
+    data.append('Path', names[x]);
+    data.append('Visibility', 'public');
+
+    var config = {
+      method: 'post',
+      url:
+        'https://serverless-upload.twilio.com/v1/Services/' +
+        request.twilioServiceSid +
+        '/' +
+        type +
+        's/' +
+        request[twilioTypeSids][names[x]] +
+        '/Versions',
+      headers: {
+        Authorization: 'Basic ' + Buffer.from(`${request.twilioUser}:${request.twilioPassword}`, 'utf8').toString('base64'),
+        ...data.getHeaders(),
+      },
+      data: data,
+    };
+    await axios(config)
+      .then(function (response) {
+        console.log(type + ' VERSION ID: ' + JSON.stringify(response.data.sid));
+        build.append(type + 'Versions', response.data.sid);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } //  close for each asset
+};
+
+const createBuild = async request => {};
+
+const createDeploy = async request => {};
 
 //listen for request on port 3000, and as a callback function have the port listened on logged
 app.listen(port, () => {
