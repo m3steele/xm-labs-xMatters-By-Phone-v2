@@ -238,8 +238,11 @@ const createAssetFunction = async (request, type) => {
   // Create new Twilio Function or Asset Version
   for (var x in names) {
     var data = new FormData();
-
-    const url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
+    if (type === 'Function') {
+      const url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', '') + '.js');
+    } else {
+      const url = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
+    }
 
     data.append('Content', fs.createReadStream(url));
     data.append('Path', names[x]);
