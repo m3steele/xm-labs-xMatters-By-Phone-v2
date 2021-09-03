@@ -236,7 +236,7 @@ const createAssetFunction = async (request, type) => {
   }
 
   // Create new Twilio Function or Asset Version
-  for (var x in version) {
+  for (var x in names) {
     var data = new FormData();
 
     const path = path.join(__dirname + '/TwilioFunctions/' + names[x].replace(' ', ''));
