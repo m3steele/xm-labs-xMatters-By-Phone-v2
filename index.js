@@ -65,11 +65,8 @@ app.post('/installfunctions', async function (req, res) {
 
 // request - The incoming payload
 // type - can be either "Asset" or "Function"
-// build - the object containing function and asset versions to deploy
+// build - the object containing function versions or asset versions to deploy
 const createAssetFunction = async (request, type, build) => {
-  //Asset
-  //Function
-
   //Create path to twilioAssetstoDeploy or twilioFunctionstoDeploy in request
   const twilioTypetoDeploy = 'twilio' + type + 'stoDeploy';
   //Create path to twilioAssetSids or twilioFunctionSids in request

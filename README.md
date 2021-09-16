@@ -41,6 +41,13 @@ _Version 2 of the integration has many new features and quality of life enhancem
 - Various bug fixes
 - Added Process Map to documentation
 
+**Sept 16, 2021 Updates**
+
+- Node.js application added to allow for automatic installation of Twilio service and related components.
+- Node.js application can be deployed on your own server or you can use the one already deployed here:
+  https://twilio-install-function-server.herokuapp.com/
+- xMatters workflow updated to work with node installation application.
+
 <kbd>
   <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
 </kbd>
@@ -483,32 +490,47 @@ We need your Twilio authentication credentials for xMatters to communicate with 
    Twilio Account SID => Username
    Twilio Account Token => Password
 
-## Deploy a Twilio Service using xMatters Install Integration Form
+## Set "Twilio Function Install Service" Endpoint Base URL (optional)
 
-This will programmatically create a Twilio Service and create all of the required environment variables into Twilio.
+This step is only required if you plan on using your own Installation server.
 
-Before doing this step you should make sure you have configured xMatters Workflow Constants and xMatters endpoints for Twilio.
+Set the Endpoint Base URL for Twilio Function Install Service.
 
-In the future this step may be enhanced to also deploy function versions (script) in Twilio and completely automate the installation process.
+1. Open the Initiate Event via Phone Call v2 workflow in xMatters
+2. Click Flows tab
+3. Click Components and go to Endpoints
+4. Set the Endpoint Base URL for Twilio Function Install Service. This should point to your intstallation server.
 
-To deploy a function version to Twilio, the API request must be multipart/form-data and this is not currently supported by xMatters.
+Default value pointing to xMatters Installation server is: https://twilio-install-function-server.herokuapp.com/
+
+## Install Twilio Service using xMatters Install Integration Form
+
+This will programmatically create a Twilio Service and create all of the required functions, assets, dependencies and environment variables in Twilio.
+
+Before doing this step, you should make sure you have configured xMatters Workflow Constants and xMatters endpoints for Twilio.
 
 1. Open the Install Integration xMatters Form. Make sure it is deployed to Web UI or you will not be able to find/use it.
 2. Set form fields appropriately.
 
+   **Twilio Account SID**: Your Twilio Account SID (from Twilio Dashboard)
+
+   **Twilio Auth Token**: Your Twilio Auth Token (from Twilio Dashboard)
+
    **Twilio Service Name**: This will be the name of the service created in Twilio.
 
-   **Functions to Deploy**: These are the names of the functions to create in Twilio. Currently this feature does not do anything.
+   **Functions to Deploy**: These are the names of the functions to create in Twilio.
+
+   **Assets to Deploy**: These are the names of the assets to create in Twilio.
 
 3. Click Send Message.
 
-   - Re-running this form in the future will return any changed environment variables in Twilio back to the value in the corresponding xMatters constant.
+   - Using the Install Integration messaging form with the same Twilio Service Name multiple times will abort the installation and leave any changes in Twilio intact.
    - This form does not need to target any recipients.
-   - Instead of using this form, you could create a Twilio Service and add all of the Environment Variables manually.
+   - Instead of using this form, you could create a Twilio Service and add all of the Functions, Assets and Environment Variables manually.
 
-## Configure Twilio Service
+## How to Configure Twilio Service (only required for manual installaiton. Not required when using Installation service)
 
-In this step we will be adding Twilio functions and dependencies to the service we just deployed.
+In this step we will be adding Twilio functions and dependencies to the service we just deployed. This is not required if installing using insatallation service. This informaiton is provided to show you how you would do this manually or to make changes after installation.
 
 ### Open Twilio Service
 
@@ -849,7 +871,7 @@ Once you have configured and saved the **xm_settings** function you are ready to
 4. Click **Deploy All** button.
 5. Wait for the Twilio Service to be deployed and display success message in the live logs.
 
-## Configure Twilio Voice Number.
+## Configure Twilio Voice Number
 
 1. Go to **Phone Numbers**.
 
