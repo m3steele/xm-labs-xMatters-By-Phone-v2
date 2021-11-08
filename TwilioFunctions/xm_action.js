@@ -7,7 +7,7 @@ exports.handler = function (context, event, callback) {
   let altertTypes = '';
   for (let at in settings.alertTypes) {
     // add each alert type in order
-    altertTypes += setting.options[settings.alertTypes[at]].m + ' ';
+    altertTypes += settings.options[settings.alertTypes[at]].m + ' ';
   }
 
   const gather = twiml.gather({

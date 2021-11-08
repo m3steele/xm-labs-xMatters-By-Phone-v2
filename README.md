@@ -48,6 +48,12 @@ _Version 2 of the integration has many new features and quality of life enhancem
   https://twilio-install-function-server.herokuapp.com/
 - xMatters workflow updated to work with node installation application.
 
+**Nov 08, 2021 Updates**
+
+- Updated included xMatters workflow. This was updated previously but was not included in error.
+- Fixed a reference to settings in xm_actions that was incorrect.
+- Added logic to set callerID to Twilio number if it is not supplied in settings.
+
 <kbd>
   <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
 </kbd>

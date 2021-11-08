@@ -209,6 +209,11 @@ exports.handler = function (context, event, callback) {
   setting.xm_bridgeforward = '/xm_bridgeforward';
   setting.xm_endqueue = '/xm_endqueue';
 
+  // set caller id to twilio number if not set in settings above.
+  if (setting.callerID == '') {
+    setting.callerID = event.To;
+  }
+
   // Sets up the Group targeting menu.
   // You probably shouldn't change this but if you must, be careful.
   for (i = 0; i < setting.NumberofGroups; i++) {

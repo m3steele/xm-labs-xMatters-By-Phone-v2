@@ -1,3 +1,4 @@
+let got = require('got');
 exports.handler = function (context, event, callback) {
   console.log('RECORD');
   let settings = JSON.parse(decodeURI(event.setting));
