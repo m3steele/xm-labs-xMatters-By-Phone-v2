@@ -188,7 +188,7 @@ exports.handler = function (context, event, callback) {
                 '?setting=' +
                 encodeURI(JSON.stringify(settings)) +
                 '&targets=' +
-                encodeURI(JSON.stringify(targets)) +
+                encodeURIComponent(JSON.stringify(targets)) +
                 '&Message_Phrase=' +
                 encodeURI(event.Message_Phrase) +
                 '&groupIndex=' +
