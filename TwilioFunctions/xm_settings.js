@@ -139,7 +139,7 @@ exports.handler = function (context, event, callback) {
   // http://twimlets.com/holdmusic?Bucket=com.twilio.music.rock
   // http://twimlets.com/holdmusic?Bucket=com.twilio.music.soft-rock
   // Alternatively, provide your own hold music by customizing the holdMusic.xml file and referencing it below.
-  setting.holdMusic = 'https://xmattersbyphone-3972.twil.io/holdMusic.xml';
+  setting.holdMusic = 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical';
 
   //***************************************
   // MESSAGE PHRASE SETTINGS
