@@ -38,8 +38,7 @@ exports.handler = function (context, event, callback) {
             settings.xm_connect +
             '?setting=' +
             encodeURI(
-              JSON.stringify(settings) + '&escalation=' + escalation + '&targets=' + encodeURI(JSON.stringify(targets)) + '&Digits=' + event.Digits
-            ),
+              JSON.stringify(settings)) + '&escalation=' + escalation + '&targets=' + encodeURIComponent(JSON.stringify(targets)) + '&Digits=' + event.Digits,
         });
 
         gather.say(
@@ -59,7 +58,7 @@ exports.handler = function (context, event, callback) {
             context.DOMAIN_NAME +
             settings.xm_escalate +
             '?setting=' +
-            encodeURI(JSON.stringify(settings) + '&escalation=' + escalation + '&targets=' + encodeURI(JSON.stringify(targets)) + '&nodigits=true')
+            encodeURI(JSON.stringify(settings)) + '&escalation=' + escalation + '&targets=' + encodeURIComponent(JSON.stringify(targets)) + '&nodigits=true'
         );
 
         callback(null, twiml);
