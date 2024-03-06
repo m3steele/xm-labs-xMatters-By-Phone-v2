@@ -37,7 +37,7 @@ exports.handler = function (context, event, callback) {
         '?setting=' +
         encodeURI(JSON.stringify(settings)) +
         '&targets=' +
-        encodeURI(JSON.stringify(targets)) +
+        encodeURIComponent(JSON.stringify(targets)) +
         '&escalation=' +
         parseInt(event.escalation, 10);
       payload.statusCallbackEvent = ['completed'];
@@ -49,7 +49,7 @@ exports.handler = function (context, event, callback) {
         '?setting=' +
         encodeURI(JSON.stringify(settings)) +
         '&targets=' +
-        encodeURI(JSON.stringify(targets)) +
+        encodeURIComponent(JSON.stringify(targets)) +
         '&escalation=' +
         escalation +
         '&cb=true';
@@ -94,7 +94,7 @@ exports.handler = function (context, event, callback) {
                   '&name=' +
                   encodeURI(targets[parseInt(event.escalation, 10)].fullName) +
                   '&targets=' +
-                  encodeURI(JSON.stringify(targets)) +
+                  encodeURIComponent(JSON.stringify(targets)) +
                   '&escalation=' +
                   parseInt(event.escalation, 10),
               })
